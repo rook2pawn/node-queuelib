@@ -11,13 +11,16 @@ example
 	var myWorkFunction = function(el) { console.log(el + " is great!"); myEmitter.emit('next'); };
 	var q = Qlib({work:myWorkFunction, emitter:myEmitter});
 
-	q.push('NodeJS');
-	q.push('DNode');
-	
+	q
+	.push('NodeJS')
+	.push('DNode')
+	.push('Cats');
+
 	// Results in 
 
 	> NodeJS is great!
 	> DNode is great!
+	> Cats is great! (exscuse my grammar)
 
 handles asynchronous functions with ease!
 -----------------------------------------
