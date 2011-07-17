@@ -1,0 +1,14 @@
+{
+  "author": "David Wee <rook2pawn@gmail.com> (http://rook2pawn.com)",
+  "name": "queuelib",
+  "description": "Fast event driven Queue processor - handle asynchronous functions with ease",
+  "version": "0.0.0",
+  "homepage": "http://foo.com",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/rook2pawn/node-queuelib.git"
+  },
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {}
+}
