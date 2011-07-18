@@ -46,21 +46,21 @@ sortall-on-push.
 methods
 =======
 
-.push
+.push(val)
 -----
 Push a value onto the queue. 
 
-.use
+.use(function(val) { // transform val ; return val})
 ----
 Supply a function that will take a queue value and return a queue value before a value is pushed onto the queue.
 
-.sort
+.sort(function(a,b) { // perform numeric comparison; })
 -----
 Supply a numeric comparison sort function that takes two values that will sort-on-push. This uses the built-in array.sort comparison function feature (you supply a comparison function, and the Array.sort will do the rest)
 
 	e.g. .sort(function (a,b) { return a - b }) 
 
-.sortall
+.sortall(function(queue) { // perform sort on queue; return queue; })
 --------
 .sortall will superscede a .sort. Supply a function that will A .sort and .sortall method go hand-in-hand with implementing your own priority queues.
 
