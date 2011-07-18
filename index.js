@@ -15,10 +15,17 @@ function qlib(obj) {
 		throw new Error("You must supply a work function.");
 	}
 	var nextListeners = emitter.listeners('next');
-	// we unshift so that we may shift the queue down first, so that 
-	// the user may query the queue with the assumption that in the
-	// supplied next function, it can be assumed that next has already shifted the queue.
-	nextListeners.unshift(function() { 
+	// we push instead of unshift. why? if a user supplies a next function as well, and it is NOT
+	// executed first before the self.work, then the work function supplied may change some state
+	// that the user-supplied next function may have been looking for (not the new state) which would be wiped out
+	// depending on what the work function is. 
+
+	// suppose we unshifted into the listeners. Then as we started self.work immediately afterwards we then process
+	// the remaining listeners on next. These listener functions have a REASONABLE assumption that the work function
+	// for some unknown future item has not yet occurred, until all the listeners on the current 'next' event 
+	// have been exhausted.
+	nextListeners.push(function() { 
+
 		working = false;
 		if (queue.length > 0) self.work();
 	});
