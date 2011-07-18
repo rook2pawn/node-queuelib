@@ -38,7 +38,7 @@ And the queue will pick up again!
 
 you choose your own policy
 --------------------------
-	Often, an individual in possession of a queue, will want to attempt to use a priority queue system. All you have to do 
+Often, an individual in possession of a queue, will want to attempt to use a priority queue system. All you have to do 
 is use the .use method to transform your push values into something that has a numeric index, and then supply an appropriate sort
 method with the .sortall method. Simply supply a function that will accept the entire queue and the .sortall will perform a
 sortall-on-push.
