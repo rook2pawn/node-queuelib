@@ -1,9 +1,15 @@
 var EventEmitter = require('events').EventEmitter;
-var main = new EventEmitter;
 exports = module.exports = qlib;
 function qlib(obj) {
 	var work = obj.work;
 	var emitter = obj.emitter;
+	var autonext = false;
+	if (emitter === undefined) {
+		emitter = new EventEmitter;
+		autonext = true; // bad, but meh. the use case will most likely be synchronous
+		// if the user doesn't know how to implement event emitters
+		// at least we try to give them functionality.
+	}
 	var queue = [];
 	var sort = undefined;
 	var middleware = undefined;
@@ -36,23 +42,24 @@ function qlib(obj) {
 	self.work = function() {
 		if (queue[0]) {
 			stats.totalProcessed++;
-			var item = queue.shift();
-			// when qlib is called, user can supply a string
-			// for a work fn. if so, then each work function is 
-			// supplied on each object, and its name is specified in obj.work
-			// at start
-			if (typeof work !== 'string') {
-				work.call(work,item);
-			} else {
-				item[work].call(item[work],item);
-			}
+			var bits = queue.shift();
+			var item = bits[0];
+			var fn = bits[1];
+			if (work !== undefined) {
+				work.call(work,item,emitter);
+			} else if ((work === undefined) && (fn !== undefined)) {
+				fn.call(fn, item,emitter);
+			} 
+			if (autonext) emitter.emit('next'); // the one-minute lazy use case
+			// generally we want people to use the emitter in their code
+			// but for quick and dirt this will be fine.
 		} 
 	};
-	self.push = function(el) {
+	self.push = function(el,fn) {
 		if (middleware !== undefined) {
 			el = middleware(el);
 		}
-		queue.push(el);
+		queue.push([el,fn]);
 		if (sortall !== undefined) {
 			queue = sortall(queue);
 		} else if (sort !== undefined) {

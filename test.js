@@ -27,28 +27,38 @@ q
 console.log("*************");
 var myEmitter3= new EventEmitter;
 var myWorkfn3 = function(el) { setTimeout(function() { console.log(el.element + " is a creature");
-	console.log("\tindex is " + el.index);  myEmitter3.emit('next'); },5000);};
+	console.log("\tindex is " + el.index);  myEmitter3.emit('next'); },1000);};
 myEmitter3.on('next',function(){ if (q.length() > 0) console.log("next!")});
 myEmitter3.on('end',function(){ console.log("All Done.")});
-q = Qlib({work:myWorkfn3,emitter:myEmitter3});
-q
+var q2 = Qlib({work:myWorkfn3,emitter:myEmitter3});
+q2
 	.use(function(el) { 
 		return {element:el, index:el.slice(0,1).charCodeAt(0)}})
-	.sort(function(a,b) { return b.index-a.index })
+	.sort(function(a,b) { console.log("* a is ");console.log(a); console.log("* b is "); console.log(b); return (b.index-a.index) })
 	.push('aardvark')
 	.push('bat')
 	.push('cephalopod')
 ;
 
-var myEmitter4= new EventEmitter;
-myEmitter4.on('next',function(){ if (q.length() > 0) console.log("next!")});
-myEmitter4.on('end',function(){ console.log("All Done.")});
-q = Qlib({work:'myPerObjectWork',emitter:myEmitter4});
+var myEmitter5= new EventEmitter;
+myEmitter5.on('next',function(){ if (q.length() > 0) console.log("next!")});
+myEmitter5.on('end',function(){ console.log("All Done.")});
+q = Qlib({emitter:myEmitter5});
 q
-	.use(function(el) { 
-		return {val:el.val, myPerObjectWork:el.myPerObjectWork,index:el.val.slice(0,1).charCodeAt(0)}})
-	.sort(function(a,b) { return b.index-a.index })
-	.push({val:'aardvark',myPerObjectWork:function(obj) { console.log(obj.val + " is a longnosed small furry dude.");myEmitter4.emit('next');}})
-	.push({val:'bat',myPerObjectWork:function(obj){ console.log(obj.val + " is a flying furry!");myEmitter4.emit('next');}})
-	.push({val:'cephalopod',myPerObjectWork:function(obj){ console.log(obj.val + " likes to play footsie in the sea!");myEmitter4.emit('next');}})
+	.push('aardvark',function(obj,emitter) { console.log(obj+ " is a longnosed small furry dude.");emitter.emit('next');})
+	.push('bat',function(obj,emitter){ console.log(obj+ " is a flying furry!");emitter.emit('next');})
+	.push('cephalopod',function(obj,emitter){ console.log(obj + " likes to play footsie in the sea!");emitter.emit('next');})
 ;
+	var myEmitter6= new EventEmitter;
+	q = Qlib({emitter:myEmitter6});
+
+	q
+	.push('NodeJS',function(val,emitter) {console.log(val + " is great!");emitter.emit('next');})
+	.push('DNode',function(val,emitter) {console.log(val + " is freestyle RPC!");emitter.emit('next');})
+	.push('Cats', function(val,emitter) {console.log(val + " are fuzzy and sleepy.");emitter.emit('next');});
+
+q = Qlib({work:function(val) { console.log( parseInt(val) + 3) }});
+	q
+	.push(2)
+	.push(3)
+	.push(4);

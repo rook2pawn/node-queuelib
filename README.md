@@ -1,52 +1,121 @@
 QueueLib
 ========
 
-QueueLib is a small, flexible asynchronous event driven queue library.
-Features:
-1.	Work function for each element
-2.	or, each element can supply its own work function!
-3.	Transformation Middleware with .use to transform elements
-4.	Sorting Middleware with .sort or .sortall
+QueueLib is an easy, small, and flexible asynchronous event driven queue library.
+First-In, First-Out (FIFO) over asynchronous functions makes your life alot more sane!!!
 
-example
--------
+one-minute example
+------------------
 
 	var Qlib = require('queuelib');
-	var myEmitter = new EventEmitter;
-	var myWorkFunction = function(el) { console.log(el + " is great!"); myEmitter.emit('next'); };
-	var q = Qlib({work:myWorkFunction, emitter:myEmitter});
-
+	var q = Qlib({work:function(val) { console.log( parseInt(val) + 3) }});
 	q
-	.push('NodeJS')
-	.push('DNode')
-	.push('Cats');
+	.push(2)
+	.push(3)
+	.push(4);
 
 	// Results in 
+	
+	> 5
+	> 6
+	> 7
 
-	> NodeJS is great!
-	> DNode is great!
-	> Cats is great! (exscuse my grammar)
 
 handles asynchronous functions with ease!
 -----------------------------------------
 The design of QueueLib has asynchronous functions especially in mind! 
-Just emit "next" at the end of your function! (Where the emitter is the one you pass to Qlib)
+Just emit "next" at the end of your function! (Where the emitter is the one you pass to Qlib),
+and your all your asynchronous functions will behave in a FIFO manner!
+Although synchronous functions work just as fine!
 
-sample use case
----------------
-Suppose your work function launches an asynchronous call, whose result is say, 15 seconds away.
-Well, when the result is actually done, simply do
+example #1 (global work functionality)
+------------------------------------------
 
-	myEmitter.emit('next')
+	var Qlib = require('queuelib');
+	var myEmitter = new EventEmitter;
+	var q = Qlib({
+			work:function(val,emitter) { 
+				console.log( val + " is great!");
+				emitter.emit('next');
+			},
+			emitter:myEmitter
+		});
 
-And the queue will pick up again! 
+	q
+	.push('NodeJS')
+	.push('DNode')
+	// Results in 
+
+	> NodeJS is great!
+	> DNode is great!
+
+
+example #2 (per object work functionality)
+------------------------------------------
+
+	var Qlib = require('queuelib');
+	var myEmitter = new EventEmitter;
+	var q = Qlib({emitter:myEmitter});
+
+	q
+	.push('NodeJS',function(val,emitter) {console.log(val + " is great!");emitter.emit('next');})
+	.push('DNode',function(val,emitter) {console.log(val + " is freestyle RPC!");emitter.emit('next');})
+	.push('Cats', function(val,emitter) {console.log(val + " are fuzzy and sleepy.");emitter.emit('next');});
+
+	// Results in 
+
+	> NodeJS is great!
+	> DNode is freestyle RPC!
+	> Cats are fuzzy and sleepy.
+
+example #3 (asynchronous example behaving serially)
+---------------------------------------------------
+
+	var Qlib = require('queuelib');
+	var myEmitter = new EventEmitter;
+	var q = Qlib({
+			work:function(val,emitter) { 
+				setTimeout(function() {
+					console.log( val + " is great!");
+					emitter.emit('next');
+				}, 2500)
+			},
+			emitter:myEmitter
+		});
+
+	q
+	.push('NodeJS')
+	.push('DNode')
+
+	// Results in 
+
+	(2500 millisecond delay...)
+	> NodeJS is great!
+
+	(another 2500 millisecond delay...)
+	> DNode is great!
+
 
 you choose your own policy
 --------------------------
-Often, an individual in possession of a queue, will want to attempt to use a priority queue system. All you have to do 
+Priority queue system? All you have to do 
 is use the .use method to transform your push values into something that has a numeric index, and then supply an appropriate sort
 method with the .sortall method. Simply supply a function that will accept the entire queue and the .sortall will perform a
 sortall-on-push.
+
+example:
+
+	var q = Qlib({work:myWorkfn3,emitter:myEmitter3});
+	
+	q
+	.use(function(el) { 
+		return {element:el, index:el.slice(0,1).charCodeAt(0)}})
+	.sort(function(a,b) { return b.index-a.index })
+
+means that all future pushes will be sorted! In this specific example, the index we create is on
+the numeric value of the first letter. Thus the priority will be for element strings that start 
+from the letter z, y, x, ... , b, a. Go Zachary! Or Xanadu!
+
 
 methods
 =======
