@@ -1,7 +1,7 @@
 {
   "author": "David Wee <rook2pawn@gmail.com> (http://rook2pawn.com)",
   "name": "queuelib",
-  "description": "Fast event driven Queue processor - handle asynchronous functions with ease",
+  "description": "Fast event driven Queue processor - FIFO over asynchronous functions!"
   "version": "0.0.4",
   "homepage": "https://github.com/rook2pawn/node-queuelib",
   "repository": {
