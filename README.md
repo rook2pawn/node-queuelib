@@ -2,6 +2,11 @@ QueueLib
 ========
 
 QueueLib is a small, flexible asynchronous event driven queue library.
+Features:
+1.	Work function for each element
+2.	or, each element can supply its own work function!
+3.	Transformation Middleware with .use to transform elements
+4.	Sorting Middleware with .sort or .sortall
 
 example
 -------

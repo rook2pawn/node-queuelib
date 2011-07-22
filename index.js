@@ -11,9 +11,7 @@ function qlib(obj) {
 	if (emitter === undefined) {
 		emitter = new EventEmitter;
 	}
-	if ((work === undefined) || (typeof work != 'function')) {
-		throw new Error("You must supply a work function.");
-	}
+	
 	var nextListeners = emitter.listeners('next');
 	// we push instead of unshift. why? if a user supplies a next function as well, and it is NOT
 	// executed first before the self.work, then the work function supplied may change some state
@@ -39,7 +37,15 @@ function qlib(obj) {
 		if (queue[0]) {
 			stats.totalProcessed++;
 			var item = queue.shift();
-			work.call(work,item);
+			// when qlib is called, user can supply a string
+			// for a work fn. if so, then each work function is 
+			// supplied on each object, and its name is specified in obj.work
+			// at start
+			if (typeof work !== 'string') {
+				work.call(work,item);
+			} else {
+				item[work].call(item[work],item);
+			}
 		} 
 	};
 	self.push = function(el) {

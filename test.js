@@ -39,3 +39,16 @@ q
 	.push('bat')
 	.push('cephalopod')
 ;
+
+var myEmitter4= new EventEmitter;
+myEmitter4.on('next',function(){ if (q.length() > 0) console.log("next!")});
+myEmitter4.on('end',function(){ console.log("All Done.")});
+q = Qlib({work:'myPerObjectWork',emitter:myEmitter4});
+q
+	.use(function(el) { 
+		return {val:el.val, myPerObjectWork:el.myPerObjectWork,index:el.val.slice(0,1).charCodeAt(0)}})
+	.sort(function(a,b) { return b.index-a.index })
+	.push({val:'aardvark',myPerObjectWork:function(obj) { console.log(obj.val + " is a longnosed small furry dude.");myEmitter4.emit('next');}})
+	.push({val:'bat',myPerObjectWork:function(obj){ console.log(obj.val + " is a flying furry!");myEmitter4.emit('next');}})
+	.push({val:'cephalopod',myPerObjectWork:function(obj){ console.log(obj.val + " likes to play footsie in the sea!");myEmitter4.emit('next');}})
+;
