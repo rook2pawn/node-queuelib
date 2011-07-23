@@ -66,6 +66,12 @@ function qlib(obj) {
 		} 
 		return self;
 	};
+	self.forEach = function(){
+		return queue.forEach.bind(this);
+	};
+	self.queue = function() {
+		return queue;
+	};	
 	self.stats = function() {
 		return stats;
 	};

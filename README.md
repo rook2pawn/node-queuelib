@@ -156,14 +156,13 @@ the work function
 
 2. Regular workfn : function(element,emitter)
 
-3. Object Awareness: workfn : function(element, emitter,queue)
+3. Object Awareness: workfn : function(element, emitter, self)
 
 the work function is passed along three values
 1. the element itself
 2. the emitter
-3. and the queue itself.
+3. and the internal self object.
 
 1. the purpose of passing the element is for the work function to do something with the element.
 2. the purpose of passing the emitter is for the work function to signal that its done by emitting next on the emitter.
-3. the purpose of passing the queue is so that the work function may itself do arangement such as placing itself
-back in line.
+3. the purpose of passing the self is so that the work function may itself do arangement such as placing itself back in line through self.methods()
