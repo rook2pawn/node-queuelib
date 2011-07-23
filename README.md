@@ -1,8 +1,7 @@
 QueueLib
 ========
 
-QueueLib is an easy, small, and flexible asynchronous event driven queue library.
-First-In, First-Out (FIFO) over asynchronous functions makes your life alot more sane!!!
+QueueLib is an easy, small, and flexible asynchronous event driven queue library. 
 
 one-minute example
 ------------------
@@ -20,6 +19,14 @@ one-minute example
 	> 6
 	> 7
 
+Features
+========
+
+1. First-In, First-Out (FIFO) over asynchronous functions
+2. Loopback control (Objects can requeue themselves, see examples/loopback.js)
+3. control over emitter and the queue 
+4. Policy free priority queueing with middleware .use and .sort
+5. Global or per-object work functions
 
 handles asynchronous functions with ease!
 -----------------------------------------
@@ -142,4 +149,19 @@ Supply a numeric comparison sort function that takes two values that will sort-o
 		// sort the queue your way, use the .use method to create on-the-fly indexes. ;
 		return queue; }
 
- 
+the work function
+=================
+
+workfn : function(element) // *NOVICE* least exposure
+workfn : function(element,emitter) // *STANDARD* control over the emitter
+workfn : function(element, emitter,queue) // *ADVANCED* control over the queue
+
+the work function is passed along three values
+1. the element itself
+2. the emitter
+3. and the queue itself.
+
+1. the purpose of passing the element is for the work function to do something with the element.
+2. the purpose of passing the emitter is for the work function to signal that its done by emitting next on the emitter.
+3. the purpose of passing the queue is so that the work function may itself do arangement such as placing itself
+back in line.

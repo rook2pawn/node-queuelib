@@ -14,10 +14,6 @@ function qlib(obj) {
 	var sort = undefined;
 	var middleware = undefined;
 	var sortall = undefined;
-	if (emitter === undefined) {
-		emitter = new EventEmitter;
-	}
-	
 	var nextListeners = emitter.listeners('next');
 	// we push instead of unshift. why? if a user supplies a next function as well, and it is NOT
 	// executed first before the self.work, then the work function supplied may change some state
@@ -29,7 +25,6 @@ function qlib(obj) {
 	// for some unknown future item has not yet occurred, until all the listeners on the current 'next' event 
 	// have been exhausted.
 	nextListeners.push(function() { 
-
 		working = false;
 		if (queue.length > 0) self.work();
 	});
@@ -46,9 +41,9 @@ function qlib(obj) {
 			var item = bits[0];
 			var fn = bits[1];
 			if (work !== undefined) {
-				work.call(work,item,emitter);
+				work.apply(work,[item,emitter,self])
 			} else if ((work === undefined) && (fn !== undefined)) {
-				fn.call(fn, item,emitter);
+				fn.apply(fn,[item,emitter,self]);
 			} 
 			if (autonext) emitter.emit('next'); // the one-minute lazy use case
 			// generally we want people to use the emitter in their code
@@ -59,7 +54,7 @@ function qlib(obj) {
 		if (middleware !== undefined) {
 			el = middleware(el);
 		}
-		queue.push([el,fn]);
+		queue.push(arguments);
 		if (sortall !== undefined) {
 			queue = sortall(queue);
 		} else if (sort !== undefined) {
