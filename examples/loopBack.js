@@ -8,7 +8,7 @@ q5
 	.push('aardvark!!!!',function(obj,emitter,self) { 
 		console.log(obj + " is a creature!");
 		setTimeout(function(){
-			self.push(obj,function(val,emitter,queue){
+			self.push(obj,function(val,emitter,self){
 				console.log(val + " is back of the line again...");emitter.emit('next');
 			});
 		},600);

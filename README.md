@@ -102,6 +102,38 @@ example #3 (asynchronous example behaving serially)
 	(another 2500 millisecond delay...)
 	> DNode is great!
 
+example #4 (loopback control)
+---------------------------------------------------
+
+	var Qlib = require('queuelib');
+	var myEmitter = new EventEmitter;
+	var q = Qlib({emitter:myEmitter});
+	q.push('aardvark', function(obj,emitter,self) {
+		console.log(obj + " is a creature!");
+		setTimeout(function(){
+			self.push(obj,function(val,emitter,self) {
+			console.log(obj + " is now in the back of the line");
+			emitter.emit('next');
+			});
+		}, 600);
+		emitter.emit('next');
+	})
+	.push('bat', function(obj,emitter) {
+		console.log(obj + " flies.");
+		emitter.emit('next');
+	})
+	.push('cephalopod',function(obj,emitter){
+		console.log(obj + " likes to play sea footsie!");
+		emitter.emit('next');
+	});
+
+	// results in
+	
+	> aardvark is a creature!
+	> bat flies.
+	> cephalopod likes to play sea footsie!
+	// after 600 ms
+	> aardvark is now in the back of the line
 
 you choose your own policy
 --------------------------
