@@ -181,20 +181,24 @@ Supply a numeric comparison sort function that takes two values that will sort-o
 		// sort the queue your way, use the .use method to create on-the-fly indexes. ;
 		return queue; }
 
+.queue 
+------
+.queue returns the internal queue. this method is primarily meant to be invoked through the work function self parameter, i.e. self.queue() within the execution of the work function
+
+.forEach
+--------
+.forEach returns the forEach function binded to the queue. This method is primarily meant to be invoked through the work function self parameter, i.e. self.forEach() within the execution of the work function
+
 the work function
 =================
 
-1. Basic workfn : function(element) 
+work(element,emitter,self)
 
-2. Regular workfn : function(element,emitter)
+The work function, combined with .use, allows for many types of queue constructs
 
-3. Object Awareness: workfn : function(element, emitter, self)
+1. Internally directed flow control
+2. Loop back (self-placement)
+3. Serial Asynchronous : asynchronous functions executes serially
+4. Full Asynchronous : if you don't include the emitter on invocation of
+Queuelib, then Queuelib assumes to emit next after execution of the work function, regardless if the work function is synchronous or asynchronous.
 
-the work function is passed along three values
-1. the element itself
-2. the emitter
-3. and the internal self object.
-
-1. the purpose of passing the element is for the work function to do something with the element.
-2. the purpose of passing the emitter is for the work function to signal that its done by emitting next on the emitter.
-3. the purpose of passing the self is so that the work function may itself do arangement such as placing itself back in line through self.methods()
