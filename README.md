@@ -152,9 +152,11 @@ Supply a numeric comparison sort function that takes two values that will sort-o
 the work function
 =================
 
-workfn : function(element) // *NOVICE* least exposure
-workfn : function(element,emitter) // *STANDARD* control over the emitter
-workfn : function(element, emitter,queue) // *ADVANCED* control over the queue
+1. Basic workfn : function(element) 
+
+2. Regular workfn : function(element,emitter)
+
+3. Object Awareness: workfn : function(element, emitter,queue)
 
 the work function is passed along three values
 1. the element itself
