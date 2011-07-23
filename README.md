@@ -185,10 +185,6 @@ Supply a numeric comparison sort function that takes two values that will sort-o
 ------
 .queue returns the internal queue. this method is primarily meant to be invoked through the work function self parameter, i.e. self.queue() within the execution of the work function
 
-.forEach
---------
-.forEach returns the forEach function binded to the queue. This method is primarily meant to be invoked through the work function self parameter, i.e. self.forEach() within the execution of the work function
-
 the work function
 =================
 
