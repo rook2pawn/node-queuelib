@@ -67,7 +67,7 @@ function qlib(obj) {
 		return self;
 	};
 	self.queue = function() {
-		return queue;
+		return queue.slice(0);
 	};	
 	self.stats = function() {
 		return stats;
