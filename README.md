@@ -28,6 +28,7 @@ Features
 4. Policy free priority queueing with middleware .use and .sort
 5. Global or per-object work functions
 
+
 handles asynchronous functions with ease!
 -----------------------------------------
 The design of QueueLib has asynchronous functions especially in mind! 
@@ -154,6 +155,23 @@ example:
 means that all future pushes will be sorted! In this specific example, the index we create is on
 the numeric value of the first letter. Thus the priority will be for element strings that start 
 from the letter z, y, x, ... , b, a. Go Zachary! Or Xanadu!
+
+invocations
+===========
+
+Qlib is flexible!
+
+1. var q = Qlib();
+2. var q = Qlib({work:function(){});
+3. var q = Qlib({emitter:myEmitter});
+4. var q = Qlib({work:function(){},emitter:myEmitter});
+
+New: Also included is 
+5. var q = Qlib({noDeleteOnNext:true}); 
+
+noDeleteOnNext flag allows you to keep the FIFO behaviour of the queue, without specifically deleting the elements on emit('next').
+This allows one a fine grain control over when and how the delete behaviour should be invoked within the realm of the work function
+(the work function is passed self as the third parameter, you can retrieve the queue via self.queue() within the work function)
 
 
 methods
