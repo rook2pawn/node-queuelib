@@ -1,7 +1,7 @@
 var EventEmitter = require('events').EventEmitter;
 var myEmitter = new EventEmitter;
 var myWorkfn = function(el,emitter) { console.log(el + " is an animal");emitter.emit('next');};
-var Qlib = require('./index.js');
+var Qlib = require('../index.js');
 var q = Qlib({work:myWorkfn,emitter:myEmitter}); 
 q
 	.push('cat')

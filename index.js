@@ -3,6 +3,7 @@ exports = module.exports = qlib;
 function qlib(obj) {
 	var work = obj.work;
 	var emitter = obj.emitter;
+	var noDeleteOnNext = obj.noDeleteOnNext || false;
 	var autonext = false;
 	if (emitter === undefined) {
 		emitter = new EventEmitter;
@@ -11,6 +12,7 @@ function qlib(obj) {
 		// at least we try to give them functionality.
 	}
 	var queue = [];
+	if (noDeleteOnNext) queue.next = 0;
 	var sort = undefined;
 	var middleware = undefined;
 	var sortall = undefined;
@@ -35,15 +37,19 @@ function qlib(obj) {
 	var working = false;
 	var self = {};
 	self.work = function() {
-		if (queue[0]) {
+		var item; 
+		if (!noDeleteOnNext) item = queue[0];
+		else item = queue[queue.next];
+		if (item) {
 			stats.totalProcessed++;
-			var bits = queue.shift();
-			var item = bits[0];
-			var fn = bits[1];
+			if (!noDeleteOnNext) queue.shift();
+			else queue.next++;
+			var element = item[0];
+			var fn = item[1];
 			if (work !== undefined) {
-				work.apply(work,[item,emitter,self])
+				work.apply(work,[element,emitter,self])
 			} else if ((work === undefined) && (fn !== undefined)) {
-				fn.apply(fn,[item,emitter,self]);
+				fn.apply(fn,[element,emitter,self]);
 			} 
 			if (autonext) emitter.emit('next'); // the one-minute lazy use case
 			// generally we want people to use the emitter in their code
