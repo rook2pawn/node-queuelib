@@ -56,6 +56,16 @@ function qlib(obj) {
 			// but for quick and dirt this will be fine.
 		} 
 	};
+	// shorten the queue by n elements, starting from the beginning index 0 to n-1
+	self.shorten = function(n) {
+		for (var i = 0; i < n; i++) {
+			queue.shift();
+		}
+	};
+	self.update = function() {
+		this.shorten(queue.next);
+		queue.next = 0;
+	}
 	self.push = function(el,fn) {
 		if (middleware !== undefined) {
 			el = middleware(el);

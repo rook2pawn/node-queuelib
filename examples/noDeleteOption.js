@@ -18,5 +18,7 @@ q5
 	})
 	.push('bat',function(obj,emitter,self){ console.log(obj+ " is a flying furry!");console.log(self.queue());emitter.emit('next');})
 	.push('cephalopod',function(obj,emitter,self){ console.log(obj + " likes to play footsie in the sea!");console.log(self.queue());emitter.emit('next');})
+	.push('dog',function(obj,emitter,self){ console.log(obj + " woofs!"); console.log(self.queue()); self.update();console.log("After update"); console.log(self.queue()); emitter.emit('next');})
+	.push('elephant', function(obj,emitter,self){ console.log(obj + " has tusks."); console.log(self.queue()); emitter.emit('next');})
 ;
 
