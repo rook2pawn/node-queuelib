@@ -4,9 +4,13 @@ QueueLib
 QueueLib is a robust and flexible asynchronous flow control queue library. 
 
 Robust: Want a governor function that has full control over the queue on push?
+
 How about a transform interface that modifies the queue elements on push?
+
 Policy-Free Priority Queue? You got it with custom sorts and transforms.
+
 A single work function for all your objects you push? Sure.
+
 A work function supplied by each object that governs itself? Yup.
 
 
