@@ -1,16 +1,11 @@
 var EventEmitter = require('events').EventEmitter;
+var textual = require('textual');
 exports = module.exports = qlib;
 function qlib(obj) {
 	var work = obj.work;
-	var emitter = obj.emitter;
+	var emitter = new EventEmitter;
 	var noDeleteOnNext = obj.noDeleteOnNext || false;
-	var autonext = false;
-	if (emitter === undefined) {
-		emitter = new EventEmitter;
-		autonext = true; // bad, but meh. the use case will most likely be synchronous
-		// if the user doesn't know how to implement event emitters
-		// at least we try to give them functionality.
-	}
+	var autonext = obj.autonext || false;
 	var queue = [];
 	if (noDeleteOnNext) queue.next = 0;
 	var sort = undefined;
@@ -46,12 +41,16 @@ function qlib(obj) {
 			else queue.next++;
 			var element = item[0];
 			var fn = item[1];
+			var myWorkFunction;
 			if (work !== undefined) {
-				work.apply(work,[element,emitter,self])
+				myWorkFunction = work;
 			} else if ((work === undefined) && (fn !== undefined)) {
-				fn.apply(fn,[element,emitter,self]);
+				myWorkFunction = fn;
 			} 
-			if (autonext) emitter.emit('next'); // the one-minute lazy use case
+			myWorkFunction.apply(myWorkFunction,[element,self]);
+			var doneCall = textual.doesObjectCallMethod(myWorkFunction,textual.getLastArg(myWorkFunction),'done');
+			console.log("Done call is " + doneCall);
+			if ((!doneCall) || (autonext))  emitter.emit('next'); // the one-minute lazy use case
 			// generally we want people to use the emitter in their code
 			// but for quick and dirt this will be fine.
 		} 
@@ -81,6 +80,9 @@ function qlib(obj) {
 			this.work();
 		} 
 		return self;
+	};
+	self.done = function() {
+		emitter.emit('next');
 	};
 	self.queue = function() {
 		return queue.slice(0);
