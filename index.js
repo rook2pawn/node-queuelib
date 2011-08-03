@@ -14,7 +14,7 @@ function qlib(obj) {
 	var queue = [];
 	if (noDeleteOnNext) queue.next = 0;
 	var sort = undefined;
-	var middleware = undefined;
+	var transform = undefined;
 	var sortall = undefined;
 	var nextListeners = emitter.listeners('next');
 	// we push instead of unshift. why? if a user supplies a next function as well, and it is NOT
@@ -67,8 +67,8 @@ function qlib(obj) {
 		queue.next = 0;
 	}
 	self.push = function(el,fn) {
-		if (middleware !== undefined) {
-			el = middleware(el);
+		if (transform !== undefined) {
+			el = transform(el);
 		}
 		queue.push(arguments);
 		if (sortall !== undefined) {
@@ -102,8 +102,8 @@ function qlib(obj) {
 		sortall = sortfn;
 		return self;
 	}
-	self.use = function(middlewarefn) {
-		middleware = middlewarefn;
+	self.transform = function(middlewarefn) {
+		transform = middlewarefn;
 		return self;
 	};
 	return self;

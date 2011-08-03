@@ -1,13 +1,23 @@
 QueueLib
 ========
 
-QueueLib is an easy, small, and flexible asynchronous event driven queue library. 
+QueueLib is a robust and flexible asynchronous flow control queue library. 
+
+Robust: Want a governor function that has full control over the queue on push?
+How about a transform interface that modifies the queue elements on push?
+Policy-Free Priority Queue? You got it with custom sorts and transforms.
+A single work function for all your objects you push? Sure.
+A work function supplied by each object that governs itself? Yup.
+
 
 one-minute example
 ------------------
 
 	var Qlib = require('queuelib');
-	var q = Qlib({work:function(val) { console.log( parseInt(val) + 3) }});
+	var work = function(val) {
+		return parseInt(val) + 3
+	};
+	var q = Qlib({work:work}});
 	q
 	.push(2)
 	.push(3)
@@ -25,7 +35,7 @@ Features
 1. First-In, First-Out (FIFO) over asynchronous functions
 2. Loopback control (Objects can requeue themselves, see examples/loopback.js)
 3. control over emitter and the queue 
-4. Policy free priority queueing with middleware .use and .sort
+4. Policy free priority queueing with middleware .transform and .sort
 5. Global or per-object work functions
 
 
@@ -139,7 +149,7 @@ example #4 (loopback control)
 you choose your own policy
 --------------------------
 Priority queue system? All you have to do 
-is use the .use method to transform your push values into something that has a numeric index, and then supply an appropriate sort
+is use the .transform method to transform your push values into something that has a numeric index, and then supply an appropriate sort
 method with the .sortall method. Simply supply a function that will accept the entire queue and the .sortall will perform a
 sortall-on-push.
 
@@ -148,7 +158,7 @@ example:
 	var q = Qlib({work:myWorkfn3,emitter:myEmitter3});
 	
 	q
-	.use(function(el) { 
+	.transform(function(el) { 
 		return {element:el, index:el.slice(0,1).charCodeAt(0)}})
 	.sort(function(a,b) { return b.index-a.index })
 
@@ -181,7 +191,7 @@ methods
 -----
 Push a value onto the queue. 
 
-.use(function(val) { // transform val ; return val})
+.transform(function(val) { // transform val ; return val})
 ----
 Supply a function that will take a queue value and return a queue value before a value is pushed onto the queue.
 
@@ -196,7 +206,7 @@ Supply a numeric comparison sort function that takes two values that will sort-o
 .sortall will superscede a .sort. Supply a function that will A .sort and .sortall method go hand-in-hand with implementing your own priority queues.
 
 	e.g. .sortall(function (queue) { 
-		// sort the queue your way, use the .use method to create on-the-fly indexes. ;
+		// sort the queue your way, use the .transform method to create on-the-fly indexes. ;
 		return queue; }
 
 .queue 
@@ -208,7 +218,7 @@ the work function
 
 work(element,emitter,self)
 
-The work function, combined with .use, allows for many types of queue constructs
+The work function, combined with .transform, allows for many types of queue constructs
 
 1. Internally directed flow control
 2. Loop back (self-placement)
