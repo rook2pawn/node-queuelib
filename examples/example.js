@@ -1,8 +1,7 @@
 var EventEmitter = require('events').EventEmitter;
 var Qlib = require('../index');
-var myEmitter = new EventEmitter;
-var myWorkFunction = function(el) { console.log(el + " is great!"); myEmitter.emit('next'); };
-var q = Qlib({work:myWorkFunction, emitter:myEmitter});
+var myWorkFunction = function(el,lib) { console.log(el + " is great!"); lib.done();};
+var q = Qlib({work:myWorkFunction});
 
 q.push('NodeJS');
 q.push('DNode');
