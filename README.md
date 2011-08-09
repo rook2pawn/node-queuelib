@@ -53,6 +53,10 @@ noDeleteOnNext is a boolean. If true, then the queue will NOT delete the element
 Methods
 =======
 
+.push(element, workfn) 
+----------------------
+element is required. workfn is optional, if already supplied by a global workfunction in the flags.work section. Pushes element onto the queue. If workfn is supplied, this overrides the global work function if set. 
+
 .sort(sortfn) 
 -------------
 Supply a sorting function for your queue after a push. This sort function should take two arguments and return either a positive or negative or 0 value. It is applied exactly like the Array.prototype.sort
@@ -80,5 +84,38 @@ Returns the current length of the queue.
 .update()
 ---------
 Call this to trim the queue from index 0 to the current position. Use this option when the nodelete flag is specified.
+
+The Work Function
+=================
+
+Okay a whole section devoted to just the work function!
+
+Your supplied work function should look like this
+
+	var myWorkFunction = function(element, lib) {
+		// do stuff
+		lib.done();
+	};
+
+The second argument is optional. In fact, if you just define 
+your work function as
+
+	var myWorkFunction = function(element) {
+		// do stuff
+	}
+
+Notice that we did not call .done(). Queuelib is smart enough to recognize that
+any second argument did not call that method, and will automagically invoke autonext to be true for that particular processing of that element! Sweet!
+
+Here's what you need to know: 
+
+The work function takes two arguments, the element itself that is to be processed, and the library object. The library object has access to all the methods discussed in the Methods section, most importantly, the .done() method in order to signify the work function is in fact, done processing.
+
+Example:
+
+	var workfn = function(element, lib) {
+		var x = element % 5;
+		lib.done();
+	}
 
 
