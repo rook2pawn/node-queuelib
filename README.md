@@ -38,15 +38,15 @@ Flags
 
 Flags as in, var Q = require('queuelib'); var myQueue = Q(flags);
 
-flag.work (optional)
+flags.work (optional)
 --------------------
 Supply a global work function that will be used on each element as they are processed.
 
-flag.autonext (optional)
+flags.autonext (optional)
 ------------------------
 autonext is a boolean. If true, then the queue will process the next element immediately after calling the work function. Only set this to be true if you know your work function is synchronous. If set to true, there is no need to call self.done() at the end of your work function.
 
-flag.noDeleteOnNext (optional) 
+flags.noDeleteOnNext (optional) 
 ------------------------------
 noDeleteOnNext is a boolean. If true, then the queue will NOT delete the element after it is done processing with the work function. Use this is conjuction with the .update() method to cull already processed members of the queue.
 
