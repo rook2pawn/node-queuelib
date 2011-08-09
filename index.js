@@ -8,19 +8,8 @@ function qlib(obj) {
 	var autonext = obj.autonext || false;
 	var queue = [];
 	if (noDeleteOnNext) queue.next = 0;
-	var sort = undefined;
-	var transform = undefined;
-	var sortall = undefined;
+	var sort,transform,governor,sortall = undefined;
 	var nextListeners = emitter.listeners('next');
-	// we push instead of unshift. why? if a user supplies a next function as well, and it is NOT
-	// executed first before the self.work, then the work function supplied may change some state
-	// that the user-supplied next function may have been looking for (not the new state) which would be wiped out
-	// depending on what the work function is. 
-
-	// suppose we unshifted into the listeners. Then as we started self.work immediately afterwards we then process
-	// the remaining listeners on next. These listener functions have a REASONABLE assumption that the work function
-	// for some unknown future item has not yet occurred, until all the listeners on the current 'next' event 
-	// have been exhausted.
 	nextListeners.push(function() { 
 		working = false;
 		if (queue.length > 0) self.work();
@@ -64,12 +53,15 @@ function qlib(obj) {
 	self.update = function() {
 		this.shorten(queue.next);
 		queue.next = 0;
-	}
+	};
 	self.push = function(el,fn) {
 		if (transform !== undefined) {
 			el = transform(el);
 		}
 		queue.push(arguments);
+		if (governor !== undefined) {
+			queue = governor(queue);
+		}
 		if (sortall !== undefined) {
 			queue = sortall(queue);
 		} else if (sort !== undefined) {
@@ -103,9 +95,13 @@ function qlib(obj) {
 	self.sortall = function(sortfn) {
 		sortall = sortfn;
 		return self;
-	}
+	};
 	self.transform = function(middlewarefn) {
 		transform = middlewarefn;
+		return self;
+	};
+	self.governor = function(governorfn) {
+		governor = governorfn;
 		return self;
 	};
 	return self;
