@@ -85,6 +85,10 @@ Returns the current length of the queue.
 ---------
 Call this to trim the queue from index 0 to the current position. Use this option when the nodelete flag is specified.
 
+.queue() 
+--------
+Returns the most current copy of the entire queue.
+
 The Work Function
 =================
 
@@ -109,7 +113,7 @@ any second argument did not call that method, and will automagically invoke auto
 
 Here's what you need to know: 
 
-The work function takes two arguments, the element itself that is to be processed, and the library object. The library object has access to all the methods discussed in the Methods section, most importantly, the .done() method in order to signify the work function is in fact, done processing.
+The work function takes two arguments, the element itself that is to be processed, and the library argument. The library argument has access to all the methods discussed in the Methods section, most importantly, the .done() method in order to signify the work function is in fact, done processing.
 
 Example:
 
