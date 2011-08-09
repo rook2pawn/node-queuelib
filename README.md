@@ -33,6 +33,20 @@ one-minute example
 	> 6
 	> 7
 
+Flags
+=====
+
+Flags as in, var Q = require('queuelib'); var myQueue = Q(flags);
+
+flag.work (optional)
+--------------------
+Supply a global work function that will be used on each element as they are processed.
+
+flag.autonext (optional)
+------------------------
+autonext is a boolean. If true, then the queue will process the next element immediately after calling the work function. Only set this to be true if you know your work function is synchronous. If set to true, there is no need to call self.done() at the end of your work function.
+
+
 Methods
 =======
 
