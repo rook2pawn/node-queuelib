@@ -2,10 +2,14 @@ var EventEmitter = require('events').EventEmitter;
 var textual = require('textual');
 exports = module.exports = qlib;
 function qlib(obj) {
-	var work = obj.work;
 	var emitter = new EventEmitter;
-	var noDeleteOnNext = obj.noDeleteOnNext || false;
-	var autonext = obj.autonext || false;
+	var noDeleteOnNext, autoNext = false;
+	var work = undefined;
+	if (obj !== undefined) {
+		noDeleteOnNext = obj.noDeleteOnNext || false;
+		work = obj.work || undefined;
+		autonext = obj.autonext || false;
+	}
 	var queue = [];
 	if (noDeleteOnNext) queue.next = 0;
 	var sort,transform,governor,sortall = undefined;
@@ -103,6 +107,9 @@ function qlib(obj) {
 	self.governor = function(governorfn) {
 		governor = governorfn;
 		return self;
+	};
+	self.flags = function() {
+		return obj;
 	};
 	return self;
 };
