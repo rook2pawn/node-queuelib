@@ -9,6 +9,7 @@ function qlib(obj) {
 		noDeleteOnNext = obj.noDeleteOnNext || false;
 		work = obj.work || undefined;
 		autonext = obj.autonext || false;
+		onNext = obj.onNext || undefined;
 	}
 	var queue = [];
 	if (noDeleteOnNext) queue.next = 0;
@@ -16,6 +17,7 @@ function qlib(obj) {
 	var nextListeners = emitter.listeners('next');
 	nextListeners.push(function() { 
 		working = false;
+		if (onNext !== undefined) { onNext();}
 		if (queue.length > 0) self.work();
 	});
 	if (emitter.listeners('done').length == 0) {
