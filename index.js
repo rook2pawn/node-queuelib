@@ -3,8 +3,8 @@ var textual = require('textual');
 exports = module.exports = qlib;
 function qlib(obj) {
 	var emitter = new EventEmitter;
-	var noDeleteOnNext, autoNext = false;
-	var work = undefined;
+	var noDeleteOnNext,autoNext = false;
+	var work,onNext  = undefined;
 	if (obj !== undefined) {
 		noDeleteOnNext = obj.noDeleteOnNext || false;
 		work = obj.work || undefined;
@@ -44,7 +44,6 @@ function qlib(obj) {
 			} 
 			myWorkFunction.apply(myWorkFunction,[element,self]);
 			var doneCall = textual.doesObjectCallMethod(myWorkFunction,textual.getLastArg(myWorkFunction),'done');
-			console.log("Done call is " + doneCall);
 			if ((!doneCall) || (autonext))  emitter.emit('next'); // the one-minute lazy use case
 			// generally we want people to use the emitter in their code
 			// but for quick and dirt this will be fine.
@@ -64,9 +63,9 @@ function qlib(obj) {
 		if (transform !== undefined) {
 			el = transform(el);
 		}
-		queue.push(arguments);
+		queue.push([].slice.call(arguments,0));
 		if (governor !== undefined) {
-			queue = governor(queue);
+			governor(queue,self);
 		}
 		if (sortall !== undefined) {
 			queue = sortall(queue);

@@ -71,7 +71,12 @@ Supply a transformation function that transforms each element before the push. T
 
 .governor(governorfn) 
 ---------------------
-Supply a governor function, which should take the entire queue as its argument. This function is applied after the push. The idea behind a governor function is that you may want to do either housekeeping or additional queue re-arrangement or modification to the elements that require looking at the queue as a whole, but keep the logic separate from the .sortall function if supplied. 
+Supply a governor function, which should takes a the queue and the lib argument (which consists of all these methods) as its arguments. The queue can be modified in place. This function is applied after the push. The idea behind a governor function is that you may want to do either housekeeping or additional queue re-arrangement or modification to the elements that require looking at the queue as a whole, but keep the logic separate from the .sortall function if supplied. 
+
+	example:
+		var q = Qlib().governor(function(queue,lib){
+				\\ do stuff
+			});
 
 .done()
 -------
