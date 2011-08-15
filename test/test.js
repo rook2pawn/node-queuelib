@@ -122,7 +122,6 @@ exports.testUpdateToLastWorkedLongAsync = function(test) {
 			lib.done();
 			myQueue = lib.queue();
 			myQueue[myQueue.length-1].pop();
-			console.log(arguments.callee.toString());
 			test.deepEqual([['bat'],['cat'],['dog']],myQueue);
 			test.done();
 		},ms);

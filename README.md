@@ -128,4 +128,31 @@ Example:
 		lib.done();
 	}
 
+Latest Test Results
+===================
+$ nodeunit test.js 
 
+test.js
+✔ testFlags
+cat!
+✔ testPushInserts
+switching value of testSwitch: false
+new value of testSwitch: true
+✔ testWorkFunction
+dog meows?
+✔ testGovernor
+✔ testGlobalWorkFunction
+✔ testNoDeleteOnNext
+✔ testUpdateToLastWorked
+aardvark
+waiting 600ms
+bat
+waiting 600ms
+cat
+waiting 600ms
+dog
+waiting 600ms
+✔ testUpdateToLastWorkedLongAsync
+✔ testTransform
+
+OK: 14 assertions (2439ms)
