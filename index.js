@@ -37,16 +37,20 @@ function qlib(obj) {
 			var element = item[0];
 			var fn = item[1];
 			var myWorkFunction;
-			if (work !== undefined) {
-				myWorkFunction = work;
-			} else if ((work === undefined) && (fn !== undefined)) {
+			// use object specified work if supplied,
+			// if undef, then use global.
+			if (fn !== undefined) {
 				myWorkFunction = fn;
+			} else if ((fn  === undefined) && (work !== undefined)) {
+				myWorkFunction = work;
 			} 
 			myWorkFunction.apply(myWorkFunction,[element,self]);
 			var doneCall = textual.doesObjectCallMethod(myWorkFunction,textual.getLastArg(myWorkFunction),'done');
-			if ((!doneCall) || (autonext))  emitter.emit('next'); // the one-minute lazy use case
-			// generally we want people to use the emitter in their code
-			// but for quick and dirt this will be fine.
+			if ((!doneCall) || (autonext)) {
+				emitter.emit('next');
+			} else {
+				//console.log("waiting for .done()");
+			}
 		} 
 	};
 	// shorten the queue by n elements, starting from the beginning index 0 to n-1
@@ -55,9 +59,20 @@ function qlib(obj) {
 			queue.shift();
 		}
 	};
-	self.update = function() {
+	self.updateToLastWorked = function() {
 		this.shorten(queue.next);
 		queue.next = 0;
+		return self;
+	};
+	self.updateInPlace = function() {
+		var last = queue[queue.length-1];
+		// this is a stub function.
+		// the goal of this function is to take the last element in
+		// the queue, and then when that work function emits the next,
+		// then there should be a trigger to make this fire,
+		// thus this function has to insert a event at the place it
+		// is called synchronously, so that update "behaves 
+		// synchronously
 	};
 	self.push = function(el,fn) {
 		if (transform !== undefined) {

@@ -83,6 +83,51 @@ exports.testNoDeleteOnNext = function(test) {
 	test.done();
 };
 
+// test that updateToLastWorked method is working (noDelete flag must be on)
+exports.testUpdateToLastWorked = function(test) {
+	test.expect(1);
+	var myQueue = [];
+	var q = qlib({noDeleteOnNext:true,work:function(el) {}});
+	q.push('aardvark')
+	.push('bat')
+	.push('cat')
+	.updateToLastWorked()
+	.push('dog');
+	myQueue = q.queue();
+	test.deepEqual([['dog']],myQueue);
+	test.done();
+};
+
+// test that updateToLastWorked method is working with long running async work functions
+exports.testUpdateToLastWorkedLongAsync = function(test) {
+	test.expect(1);
+	var myQueue = [];
+	var q = qlib({noDeleteOnNext:true,work:function(el,lib) {
+		var ms = 600;
+		setTimeout(function(){
+			console.log(el);
+			console.log("waiting "+ms+"ms");
+			lib.done();
+		},ms);
+	}});
+	q.push('aardvark')
+	.push('bat')
+	.push('cat')
+	.updateToLastWorked() // this should update to bat, cat, cutting out aardvark, which would have been worked on already.
+	.push('dog', function(el,lib) {
+		var ms = 600;
+		setTimeout(function(){
+			console.log(el);
+			console.log("waiting "+ms+"ms");
+			lib.done();
+			myQueue = lib.queue();
+			myQueue[myQueue.length-1].pop();
+			console.log(arguments.callee.toString());
+			test.deepEqual([['bat'],['cat'],['dog']],myQueue);
+			test.done();
+		},ms);
+	});
+};
 // test that the transform on push function is working
 exports.testTransform = function (test) {
 	test.expect(3);

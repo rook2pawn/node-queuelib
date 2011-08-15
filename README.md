@@ -86,9 +86,10 @@ Call this in your supplied work function after you are done with the work.
 ---------
 Returns the current length of the queue.
 
-.update()
+.updateToLastWorked()
 ---------
-Call this to trim the queue from index 0 to the current position. Use this option when the nodelete flag is specified.
+Call this to update the queue so that all elements that have already been worked on, are excised from the queue.
+Use this option when the nodelete flag is specified.
 
 .queue() 
 --------
