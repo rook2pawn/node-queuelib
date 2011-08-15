@@ -57,6 +57,7 @@ exports.testGovernor = function(test) {
 	test.equals('dog meows?',outstring);
 	test.done();
 };
+// test that the global work function is in effect
 exports.testGlobalWorkFunction = function(test) {
 	test.expect(1);
 	var myResults = [];
@@ -68,6 +69,7 @@ exports.testGlobalWorkFunction = function(test) {
 	test.deepEqual(['AARDVARK','BAT','CAT','DOG'],myResults);
 	test.done();
 };
+// test that noDeleteOnNext flag is working
 exports.testNoDeleteOnNext = function(test) {
 	test.expect(1);
 	var myQueue = [];
@@ -78,5 +80,26 @@ exports.testNoDeleteOnNext = function(test) {
 	q.push('dog');
 	myQueue = q.queue();
 	test.deepEqual([['aardvark'],['bat'],['cat'],['dog']],myQueue);
+	test.done();
+};
+
+// test that the transform on push function is working
+exports.testTransform = function (test) {
+	test.expect(3);
+	var q = qlib().transform(function(el) {
+		return {el:el, firstLetter:el.slice(0,1)}
+	});
+	q.push('aardvark',function(el,lib) {
+		test.deepEqual({el:'aardvark',firstLetter:'a'},el);
+		lib.done();
+	});
+	q.push('bat',function(el,lib) {
+		test.deepEqual({el:'bat',firstLetter:'b'},el);
+		lib.done();
+	});
+	q.push('cat',function(el,lib) {
+		test.deepEqual({el:'cat',firstLetter:'c'},el);
+		lib.done();
+	});
 	test.done();
 };
