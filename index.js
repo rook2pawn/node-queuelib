@@ -90,13 +90,29 @@ function qlib(obj) {
 		if ((queue.length > 0) && (working == false)) {
 			working = true;
 			this.work();
-		} 
+		} else {
+			console.log(queue);
+			console.log("Work Denied!!!!");
+		}
+		return self;
+	};
+	self.pause = function() {
+		working = true;
+		return self;
+	};
+	self.resume = function() {
+		working = true;
+		if (queue.length > 0) {
+			this.work();
+		}
 		return self;
 	};
 	self.done = function() {
 		emitter.emit('next');
 	};
 	self.queue = function() {
+		console.log("SOmeone is requesting queue.");
+		console.log(queue);
 		return queue.slice(0);
 	};	
 	self.stats = function() {

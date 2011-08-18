@@ -147,3 +147,58 @@ exports.testTransform = function (test) {
 	});
 	test.done();
 };
+
+exports.testPauseOnSync = function(test) {
+	var results = [];
+	var q = qlib({work:function(el) {
+		results.push(el);
+	}});
+	q
+	.push('aardvark')
+	.pause()
+	.push('bat')
+	test.expect(6);
+	test.equals('aardvark', results.pop());
+	test.equals(0, results.length);
+	test.equals(1, q.queue().length);
+	q.resume();
+	test.equals('bat',results.pop());
+	test.equals(0, results.length);
+	test.equals(0, q.queue().length);
+	test.done();
+};
+exports.testPauseOnAsync = function(test) {
+	var results = [];
+	var q = qlib({work:function(el,lib) {
+		setTimeout(function() {
+			console.log("pushing after 600ms");
+			results.push(el);
+			lib.done();
+		},600);	
+	}});
+	q
+	.push('aardvark')
+	.pause()
+	.push('bat')
+	test.expect(5);
+	console.log("INITIAL HERE QUEUE: " );
+	console.log(q.queue());
+	setTimeout(function(){
+		console.log("testing after initial 750ms");
+		test.equals('aardvark', results.pop());
+		test.equals(0, results.length);
+		console.log("queue is ==="); console.log(q.queue());
+		test.equals(1, q.queue().length);
+		q.resume();
+		setTimeout(function() {
+			console.log("testing after additional 750ms");	
+			test.equals('bat',results.pop());
+			test.equals(0,results.length);
+			test.done();
+		},750);
+	},750);
+};
+exports.testPauseOnMixed = function(test) {
+	test.expect(0);
+	test.done();
+};
