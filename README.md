@@ -57,6 +57,14 @@ Methods
 ----------------------
 element is required. workfn is optional, if already supplied by a global workfunction in the flags.work section. Pushes element onto the queue. If workfn is supplied, this overrides the global work function if set. 
 
+.pause() 
+--------
+Pauses the processing of the queue. Tested for both sync and async flows.
+
+.resume()
+---------
+Resumes processing of the queue. Tested for both sync and async flows.
+
 .sort(sortfn) 
 -------------
 Supply a sorting function for your queue after a push. This sort function should take two arguments and return either a positive or negative or 0 value. It is applied exactly like the Array.prototype.sort
