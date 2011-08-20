@@ -93,11 +93,6 @@ function qlib(obj) {
 			working = true;
 			this.work();
 		} else {
-			console.log("|*****");
-			console.log(queue);
-			console.log("Work Denied!!!!");
-			console.log("Paused:" + paused + " working :"  + working);
-			console.log("*****|");
 		}
 		return self;
 	};
@@ -116,8 +111,6 @@ function qlib(obj) {
 		emitter.emit('next');
 	};
 	self.queue = function() {
-		console.log("SOmeone is requesting queue.");
-		console.log(queue);
 		return queue.slice(0);
 	};	
 	self.stats = function() {

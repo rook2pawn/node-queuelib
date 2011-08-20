@@ -183,14 +183,11 @@ exports.testPauseOnAsync = function(test) {
 	.pause()
 	.push('bat')
 	test.expect(5);
-	console.log("INITIAL HERE QUEUE:\n|**** " );
 	console.log(q.queue());
-	console.log("****|");
 	setTimeout(function(){
 		console.log("testing after initial 750ms");
 		test.equals('aardvark', results.pop());
 		test.equals(0, results.length);
-		console.log("queue is ==="); console.log(q.queue());
 		test.equals(1, q.queue().length);
 		q.resume();
 		setTimeout(function() {
