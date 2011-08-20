@@ -138,7 +138,7 @@ Example:
 
 Latest Test Results
 ===================
-	
+
 	$ nodeunit test.js 
 
 	test.js
@@ -163,5 +163,13 @@ Latest Test Results
 	waiting 600ms
 	✔ testUpdateToLastWorkedLongAsync
 	✔ testTransform
+	✔ testPauseOnSync
+	[ [ 'bat' ] ]
+	pushing after 600ms
+	testing after initial 750ms
+	pushing after 600ms
+	testing after additional 750ms
+	✔ testPauseOnAsync
+	✔ testPauseOnMixed
 
-	OK: 14 assertions (2439ms)
+	OK: 25 assertions (3941ms)	
