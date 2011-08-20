@@ -156,15 +156,17 @@ exports.testPauseOnSync = function(test) {
 	q
 	.push('aardvark')
 	.pause()
-	.push('bat')
+	.push('bat');
 	test.expect(6);
 	test.equals('aardvark', results.pop());
 	test.equals(0, results.length);
 	test.equals(1, q.queue().length);
 	q.resume();
 	test.equals('bat',results.pop());
+	q.pause()
+	.push('cat');
 	test.equals(0, results.length);
-	test.equals(0, q.queue().length);
+	test.equals(1, q.queue().length);
 	test.done();
 };
 exports.testPauseOnAsync = function(test) {
@@ -181,8 +183,9 @@ exports.testPauseOnAsync = function(test) {
 	.pause()
 	.push('bat')
 	test.expect(5);
-	console.log("INITIAL HERE QUEUE: " );
+	console.log("INITIAL HERE QUEUE:\n|**** " );
 	console.log(q.queue());
+	console.log("****|");
 	setTimeout(function(){
 		console.log("testing after initial 750ms");
 		test.equals('aardvark', results.pop());

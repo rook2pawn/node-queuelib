@@ -3,7 +3,7 @@ var textual = require('textual');
 exports = module.exports = qlib;
 function qlib(obj) {
 	var emitter = new EventEmitter;
-	var noDeleteOnNext,autoNext = false;
+	var paused = noDeleteOnNext = autoNext = false;
 	var work,onNext  = undefined;
 	if (obj !== undefined) {
 		noDeleteOnNext = obj.noDeleteOnNext || false;
@@ -17,8 +17,10 @@ function qlib(obj) {
 	var nextListeners = emitter.listeners('next');
 	nextListeners.push(function() { 
 		working = false;
-		if (onNext !== undefined) { onNext();}
-		if (queue.length > 0) self.work();
+		if (paused === false) {
+			if (onNext !== undefined) { onNext();}
+			if (queue.length > 0) self.work();
+		}
 	});
 	if (emitter.listeners('done').length == 0) {
 		emitter.on('done',function() { console.log("Queue currently empty. All done.");});
@@ -87,21 +89,24 @@ function qlib(obj) {
 		} else if (sort !== undefined) {
 			queue.sort(sort);
 		}	
-		if ((queue.length > 0) && (working == false)) {
+		if ((queue.length > 0) && (working == false) && (paused === false)) {
 			working = true;
 			this.work();
 		} else {
+			console.log("|*****");
 			console.log(queue);
 			console.log("Work Denied!!!!");
+			console.log("Paused:" + paused + " working :"  + working);
+			console.log("*****|");
 		}
 		return self;
 	};
 	self.pause = function() {
-		working = true;
+		paused = true;
 		return self;
 	};
 	self.resume = function() {
-		working = true;
+		paused = false;
 		if (queue.length > 0) {
 			this.work();
 		}
