@@ -1,24 +1,45 @@
 QueueLib
 ========
 
-one-minute example
-------------------
+Sync example .pushSync
+----------------------
 
 	var Qlib = require('queuelib');
 	var work = function(val) {
-		return parseInt(val) + 3
+		console.log(parseInt(val) + 3)
 	};
 	var q = Qlib({work:work}});
 	q
-	.push(2)
-	.push(3)
-	.push(4);
+	.pushSync(2)
+	.pushSync(3)
+	.pushSync(4);
 
 	// Results in 
 	
 	> 5
 	> 6
 	> 7
+
+Async example .pushAsync
+------------------------
+
+	var Qlib = require('queuelib');
+	var work = function(val,lib) {
+		console.log(val + 3);
+        lib.done();
+	};
+	var q = Qlib({work:work}});
+	q
+	.pushAsync(2)
+	.pushAsync(3)
+	.pushAsync(4);
+
+	// Results in 
+	
+	> 5
+	> 6
+	> 7
+
 
 Construction Params
 ===================
@@ -27,23 +48,43 @@ Construction Params
     var myQueue = Q({work : function(){}});
 
 .work (optional)
---------------------
-Supply a global work function that will be used on each element as they are processed.
+----------------
+Supply a global work function that will be used on each element as they are processed. This is in contrast to 
+
+    myQueue.push('myItem',function(el) { // stuff });
+
+A per-item push. A per item work function superscedes the global work function, the global work function can be used as the fallback.
 
 .autonext (optional)
-------------------------
+--------------------
 autonext is a boolean. If true, then the queue will process the next element immediately after calling the work function. Only set this to be true if you know your work function is synchronous. If set to true, there is no need to call self.done() at the end of your work function.
 
 .noDeleteOnNext (optional) 
-------------------------------
+--------------------------
 noDeleteOnNext is a boolean. If true, then the queue will NOT delete the element after it is done processing with the work function. Use this is conjuction with the .update() method to cull already processed members of the queue.
 
 Methods
 =======
 
-.push(element, workfn) 
-----------------------
+.pushSync(element, workfn) 
+--------------------------
 element is required. workfn is optional, if already supplied by a global workfunction in the flags.work section. Pushes element onto the queue. If workfn is supplied, this overrides the global work function if set. 
+
+.pushAsync(element, workfn) 
+--------------------------
+element is required. workfn is optional, if already supplied by a global workfunction in the flags.work section. Pushes element onto the queue. If workfn is supplied, this overrides the global work function if set.
+
+For .pushAsync, the work function is supplied an additional argument, lib, in which you can call lib.done() in order to indicate the function is done.
+
+Example:
+
+    myQueue.pushAsync({foo:'bar'}, function(el, lib) {
+        // stuff
+        lib.done();
+    });        
+
+Alternatively you can also indicate you are done by myQueue.done() as a global way to indicate to the queue to move on to the next item. Use this in cases where the work function may not necessarily be able to track when in fact the item is fully processed.
+
 
 .pause() 
 --------
@@ -127,37 +168,40 @@ Example:
 Latest Test Results
 ===================
 
-	$ nodeunit test.js 
+    $ nodeunit test.js 
 
-	test.js
-	✔ testFlags
-	cat!
-	✔ testPushInserts
-	switching value of testSwitch: false
-	new value of testSwitch: true
-	✔ testWorkFunction
-	dog meows?
-	✔ testGovernor
-	✔ testGlobalWorkFunction
-	✔ testNoDeleteOnNext
-	✔ testUpdateToLastWorked
-	aardvark
-	waiting 600ms
-	bat
-	waiting 600ms
-	cat
-	waiting 600ms
-	dog
-	waiting 600ms
-	✔ testUpdateToLastWorkedLongAsync
-	✔ testTransform
-	✔ testPauseOnSync
-	[ [ 'bat' ] ]
-	pushing after 600ms
-	testing after initial 750ms
-	pushing after 600ms
-	testing after additional 750ms
-	✔ testPauseOnAsync
-	✔ testPauseOnMixed
+    test.js
+    ✔ testFlags
+    cat!
+    ✔ testPushInserts
+    switching value of testSwitch: false
+    new value of testSwitch: true
+    ✔ testWorkFunction
+    dog meows?
+    ✔ testGovernor
+    ✔ testGlobalWorkFunction
+    ✔ testNoDeleteOnNext
+    myQueue:
+    [ { el: 'dog', fn: undefined, type: 'sync' } ]
+    ✔ testUpdateToLastWorked
+    aardvark
+    waiting 600ms
+    bat
+    waiting 600ms
+    cat
+    waiting 600ms
+    dog
+    waiting 600ms
+    ✔ testUpdateToLastWorkedLongAsync
+    ✔ testTransform
+    ✔ testPauseOnSync
+    [ { el: 'bat', fn: undefined, type: 'async' } ]
+    pushing after 600ms
+    testing after initial 750ms
+    pushing after 600ms
+    testing after additional 750ms
+    ✔ testPauseOnAsync
+    ✔ testPauseOnMixed
 
-	OK: 25 assertions (3941ms)	
+    OK: 25 assertions (3951ms)
+

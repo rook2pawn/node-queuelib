@@ -19,7 +19,15 @@ function qlib(obj) {
 		working = false;
 		if (paused === false) {
 			if (onNext !== undefined) { onNext();}
-			if (queue.length > 0) self.work();
+			if (queue.length > 0) {
+                var item = queue[0];
+                if (item.type == 'sync') {
+                    self.workSync();
+                }
+                if (item.type == 'async') {
+                    self.workAsync();
+                }
+            }
 		}
 	});
 	if (emitter.listeners('done').length == 0) {
@@ -28,7 +36,7 @@ function qlib(obj) {
 	var stats = { totalProcessed : 0};
 	var working = false;
 	var self = {};
-	self.work = function() {
+	self.workSync = function() {
 		var item; 
 		if (!noDeleteOnNext) item = queue[0];
 		else item = queue[queue.next];
@@ -36,8 +44,8 @@ function qlib(obj) {
 			stats.totalProcessed++;
 			if (!noDeleteOnNext) queue.shift();
 			else queue.next++;
-			var element = item[0];
-			var fn = item[1];
+			var element = item.el;
+			var fn = item.fn;
 			var myWorkFunction;
 			// use object specified work if supplied,
 			// if undef, then use global.
@@ -47,12 +55,28 @@ function qlib(obj) {
 				myWorkFunction = work;
 			} 
 			myWorkFunction.apply(myWorkFunction,[element,self]);
-			var doneCall = textual.doesObjectCallMethod(myWorkFunction,textual.getLastArg(myWorkFunction),'done');
-			if ((!doneCall) || (autonext)) {
-				emitter.emit('next');
-			} else {
-				//console.log("waiting for .done()");
-			}
+            emitter.emit('next');
+		} 
+	};
+	self.workAsync = function() {
+		var item; 
+		if (!noDeleteOnNext) item = queue[0];
+		else item = queue[queue.next];
+		if (item) {
+			stats.totalProcessed++;
+			if (!noDeleteOnNext) queue.shift();
+			else queue.next++;
+			var element = item.el;
+			var fn = item.fn;
+			var myWorkFunction;
+			// use object specified work if supplied,
+			// if undef, then use global.
+			if (fn !== undefined) {
+				myWorkFunction = fn;
+			} else if ((fn  === undefined) && (work !== undefined)) {
+				myWorkFunction = work;
+			} 
+			myWorkFunction.apply(myWorkFunction,[element,self]);
 		} 
 	};
 	// shorten the queue by n elements, starting from the beginning index 0 to n-1
@@ -76,11 +100,15 @@ function qlib(obj) {
 		// is called synchronously, so that update "behaves 
 		// synchronously
 	};
-	self.push = function(el,fn) {
+	self.pushSync = function(el,fn) {
+        var obj = {};
+        obj.el = el;
+        obj.fn = fn;
+        obj.type = 'sync';
 		if (transform !== undefined) {
-			el = transform(el);
+			obj.el = transform(el);
 		}
-		queue.push([].slice.call(arguments,0));
+		queue.push(obj);
 		if (governor !== undefined) {
 			governor(queue,self);
 		}
@@ -91,7 +119,31 @@ function qlib(obj) {
 		}	
 		if ((queue.length > 0) && (working == false) && (paused === false)) {
 			working = true;
-			this.work();
+			this.workSync();
+		} else {
+		}
+		return self;
+	};
+	self.pushAsync = function(el,fn) {
+        var obj = {};
+        obj.el = el;
+        obj.fn = fn;
+        obj.type = 'async';
+		if (transform !== undefined) {
+		    obj.el = transform(el);
+		}
+		queue.push(obj);
+		if (governor !== undefined) {
+			governor(queue,self);
+		}
+		if (sortall !== undefined) {
+			queue = sortall(queue);
+		} else if (sort !== undefined) {
+			queue.sort(sort);
+		}	
+		if ((queue.length > 0) && (working == false) && (paused === false)) {
+			working = true;
+			this.workAsync();
 		} else {
 		}
 		return self;
@@ -102,9 +154,15 @@ function qlib(obj) {
 	};
 	self.resume = function() {
 		paused = false;
-		if (queue.length > 0) {
-			this.work();
-		}
+        if (queue.length > 0) {
+            var item = queue[0];
+            if (item.type == 'sync') {
+                this.workSync();
+            }
+            if (item.type == 'async') {
+                this.workAsync();
+            }
+        }
 		return self;
 	};
 	self.done = function() {

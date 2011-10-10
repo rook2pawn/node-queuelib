@@ -20,9 +20,8 @@ exports.testPushInserts = function(test) {
 	};
 	test.expect(1);
 	var q = qlib().governor(doThis);
-	q.push('cat',function(el) { 
+	q.pushSync('cat',function(el) { 
 		console.log(el + "!");
-		
 	});
 };
 
@@ -34,7 +33,7 @@ exports.testWorkFunction = function(test) {
 		test.equals(true, testSwitch);
 		test.done();
 	}});
-	q.push(testSwitch, function(el) {
+	q.pushSync(testSwitch, function(el) {
 		console.log("switching value of testSwitch: " + el)
 		el = !el;
 		testSwitch = el;
@@ -44,12 +43,12 @@ exports.testWorkFunction = function(test) {
 // test that the governor function modifies the queue
 exports.testGovernor = function(test) {
 	var doThis = function(queue,self) {
-		queue[0][0] = "dog";
+		queue[0].el = "dog";
 	};
 	test.expect(1);
 	var q = qlib().governor(doThis);
 	var outstring = "";
-	q.push('cat',function(el) { 
+	q.pushSync('cat',function(el) { 
 		outstring = el + " meows?";
 		console.log(outstring);
 	});
@@ -62,10 +61,10 @@ exports.testGlobalWorkFunction = function(test) {
 	test.expect(1);
 	var myResults = [];
 	var q = qlib({work:function(el) { myResults.push(el.toUpperCase());}});
-	q.push('aardvark')
-	.push('bat')
-	.push('cat');
-	q.push('dog');
+	q.pushSync('aardvark')
+	.pushSync('bat')
+	.pushSync('cat');
+	q.pushSync('dog');
 	test.deepEqual(['AARDVARK','BAT','CAT','DOG'],myResults);
 	test.done();
 };
@@ -74,12 +73,16 @@ exports.testNoDeleteOnNext = function(test) {
 	test.expect(1);
 	var myQueue = [];
 	var q = qlib({noDeleteOnNext:true,work:function(el) {}});
-	q.push('aardvark')
-	.push('bat')
-	.push('cat');
-	q.push('dog');
+	q.pushSync('aardvark')
+	.pushSync('bat')
+	.pushSync('cat');
+	q.pushSync('dog');
 	myQueue = q.queue();
-	test.deepEqual([['aardvark'],['bat'],['cat'],['dog']],myQueue);
+	test.deepEqual([
+    {el:'aardvark',fn:undefined,type:'sync'},
+    {el:'bat',fn:undefined,type:'sync'},
+    {el:'cat',fn:undefined,type:'sync'},
+    {el:'dog',fn:undefined,type:'sync'}],myQueue);
 	test.done();
 };
 
@@ -88,13 +91,14 @@ exports.testUpdateToLastWorked = function(test) {
 	test.expect(1);
 	var myQueue = [];
 	var q = qlib({noDeleteOnNext:true,work:function(el) {}});
-	q.push('aardvark')
-	.push('bat')
-	.push('cat')
+	q.pushSync('aardvark')
+	.pushSync('bat')
+	.pushSync('cat')
 	.updateToLastWorked()
-	.push('dog');
+	.pushSync('dog');
 	myQueue = q.queue();
-	test.deepEqual([['dog']],myQueue);
+    console.log("myQueue:");console.log(myQueue);
+	test.deepEqual([{el:'dog',fn:undefined,type:'sync'}],myQueue);
 	test.done();
 };
 
@@ -110,19 +114,22 @@ exports.testUpdateToLastWorkedLongAsync = function(test) {
 			lib.done();
 		},ms);
 	}});
-	q.push('aardvark')
-	.push('bat')
-	.push('cat')
+	q.pushAsync('aardvark')
+	.pushAsync('bat')
+	.pushAsync('cat')
 	.updateToLastWorked() // this should update to bat, cat, cutting out aardvark, which would have been worked on already.
-	.push('dog', function(el,lib) {
+	.pushAsync('dog', function(el,lib) {
 		var ms = 600;
 		setTimeout(function(){
 			console.log(el);
 			console.log("waiting "+ms+"ms");
 			lib.done();
 			myQueue = lib.queue();
-			myQueue[myQueue.length-1].pop();
-			test.deepEqual([['bat'],['cat'],['dog']],myQueue);
+            myQueue[myQueue.length-1].fn = 'strickenForTestingPurposes';
+            test.deepEqual([
+            {el:'bat',fn:undefined,type:'async'},
+            {el:'cat',fn:undefined,type:'async'},
+            {el:'dog',fn:'strickenForTestingPurposes',type:'async'}],myQueue);
 			test.done();
 		},ms);
 	});
@@ -133,15 +140,15 @@ exports.testTransform = function (test) {
 	var q = qlib().transform(function(el) {
 		return {el:el, firstLetter:el.slice(0,1)}
 	});
-	q.push('aardvark',function(el,lib) {
+	q.pushAsync('aardvark',function(el,lib) {
 		test.deepEqual({el:'aardvark',firstLetter:'a'},el);
 		lib.done();
 	});
-	q.push('bat',function(el,lib) {
+	q.pushAsync('bat',function(el,lib) {
 		test.deepEqual({el:'bat',firstLetter:'b'},el);
 		lib.done();
 	});
-	q.push('cat',function(el,lib) {
+	q.pushAsync('cat',function(el,lib) {
 		test.deepEqual({el:'cat',firstLetter:'c'},el);
 		lib.done();
 	});
@@ -154,9 +161,9 @@ exports.testPauseOnSync = function(test) {
 		results.push(el);
 	}});
 	q
-	.push('aardvark')
+	.pushSync('aardvark')
 	.pause()
-	.push('bat');
+	.pushSync('bat');
 	test.expect(6);
 	test.equals('aardvark', results.pop());
 	test.equals(0, results.length);
@@ -164,7 +171,7 @@ exports.testPauseOnSync = function(test) {
 	q.resume();
 	test.equals('bat',results.pop());
 	q.pause()
-	.push('cat');
+	.pushSync('cat');
 	test.equals(0, results.length);
 	test.equals(1, q.queue().length);
 	test.done();
@@ -179,9 +186,9 @@ exports.testPauseOnAsync = function(test) {
 		},600);	
 	}});
 	q
-	.push('aardvark')
+	.pushAsync('aardvark')
 	.pause()
-	.push('bat')
+	.pushAsync('bat')
 	test.expect(5);
 	console.log(q.queue());
 	setTimeout(function(){
