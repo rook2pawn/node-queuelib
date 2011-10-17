@@ -13,5 +13,8 @@
     "textual" : ">=v0.0.1",
     "velocity" : ">=v0.0.1"
    },
+   "scripts": {
+    "test": "nodeunit test/test.js"
+   },
   "devDependencies": {}
 }
