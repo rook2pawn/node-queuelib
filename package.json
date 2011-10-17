@@ -10,7 +10,7 @@
   },
   "main": "index.js",
   "dependencies": {
-    "textual" : ">=v0.0.1"
+    "textual" : ">=v0.0.1",
     "velocity" : ">=v0.0.1"
    },
   "devDependencies": {}
