@@ -1,8 +1,10 @@
 var EventEmitter = require('events').EventEmitter;
 var textual = require('textual');
+var Velocity = require('velocity');
 exports = module.exports = qlib;
 function qlib(obj) {
 	var emitter = new EventEmitter;
+    var speed = Velocity();
 	var paused = noDeleteOnNext = autoNext = false;
 	var work,onNext  = undefined;
 	if (obj !== undefined) {
@@ -12,6 +14,9 @@ function qlib(obj) {
 		onNext = obj.onNext || undefined;
 	}
 	var queue = [];
+    var shadowQueue = []; // strictly for speed watching
+    shadowQueue = speed.watch(shadowQueue);
+    shadowQueue.follow('push');
 	if (noDeleteOnNext) queue.next = 0;
 	var sort,transform,governor,sortall = undefined;
 	var nextListeners = emitter.listeners('next');
@@ -75,7 +80,7 @@ function qlib(obj) {
 				myWorkFunction = fn;
 			} else if ((fn  === undefined) && (work !== undefined)) {
 				myWorkFunction = work;
-			} 
+			}
 			myWorkFunction.apply(myWorkFunction,[element,self]);
 		} 
 	};
@@ -109,6 +114,7 @@ function qlib(obj) {
 			obj.el = transform(el);
 		}
 		queue.push(obj);
+        shadowQueue.push(obj);
 		if (governor !== undefined) {
 			governor(queue,self);
 		}
@@ -133,6 +139,7 @@ function qlib(obj) {
 		    obj.el = transform(el);
 		}
 		queue.push(obj);
+        shadowQueue.push(obj);
 		if (governor !== undefined) {
 			governor(queue,self);
 		}
@@ -199,5 +206,8 @@ function qlib(obj) {
 	self.flags = function() {
 		return obj;
 	};
+    self.getVelocity = function() {
+        return shadowQueue.getVelocity('push');
+    };
 	return self;
 };

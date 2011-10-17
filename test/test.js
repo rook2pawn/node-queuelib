@@ -209,3 +209,20 @@ exports.testPauseOnMixed = function(test) {
 	test.expect(0);
 	test.done();
 };
+
+exports.testVelocity = function(test) {
+    test.expect(1);
+    var q = qlib({work:function(el){}});
+    q.pushSync('foo');
+    setTimeout(function() {
+        q.pushSync('bar');
+        setTimeout(function() {
+            q.pushSync('baz');
+            setTimeout(function() {
+                q.pushSync('qux');
+                test.equals(4,q.getVelocity('push'));
+                test.done();
+            },210);
+        },210);
+    },210);
+};

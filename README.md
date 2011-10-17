@@ -132,6 +132,12 @@ Use this option when the nodelete flag is specified.
 --------
 Returns the most current copy of the entire queue.
 
+.getVelocity()
+--------------
+
+Returns the rate in pushes per second (rounded via Math.floor) on the queue.
+
+
 The Work Function
 =================
 
