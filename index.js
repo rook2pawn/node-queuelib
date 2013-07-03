@@ -51,10 +51,13 @@ function qlib(myWorkFunction) {
 		if ((queue.length > 0) && (this.working == false)) {
 			this.working = true;
 			this.workAsync();
-		} 
+		} else {
+            console.log(this.working);
+        }  
 		return this;
 	};
 	this.done = function() {
+        this.working = false;
 		emitter.emit('next');
 	};
 	this.queue = function() {
