@@ -48,3 +48,14 @@ You can advance from anywhere
     // 8
     // 10
     // 12
+
+
+You can supply your own custom work function per push
+=====================================================
+
+q is passed as the last argument, just call .done() when done
+
+    myqueue.pushAsync({foo:42}, function(obj,q) {
+        var bar = obj.foo * 2; // 84
+        q.done();
+    });
