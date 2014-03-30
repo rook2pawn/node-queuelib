@@ -68,19 +68,19 @@ Example 1
 Example 2
 ---------
 
-queue.series([
-    function(lib) {
-        console.log("getting xkcd");
-        request('http://xkcd.com',function(err,response,body) {
-            console.log(response.headers);
-            lib.done();
-        });
-    },
-    function(lib) {
-        console.log("getting nmpjs");
-        request('http://npmjs.org',function(err,response,body) {
-            console.log(response.headers);
-            lib.done();
-        });
-    }
-]);
+    queue.series([
+        function(lib) {
+            console.log("getting xkcd");
+            request('http://xkcd.com',function(err,response,body) {
+                console.log(response.headers);
+                lib.done();
+            });
+        },
+        function(lib) {
+            console.log("getting nmpjs");
+            request('http://npmjs.org',function(err,response,body) {
+                console.log(response.headers);
+                lib.done();
+            });
+        }
+    ]);
