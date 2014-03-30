@@ -1,61 +1,86 @@
 QueueLib
 ========
 
-Queuelib has been simplified, and now there are only two options. PushSync And PushAsync
+Asynchronous queue processor
 
-Example
+    - lightweight, simple
+
+
+Methods
 =======
 
-    var Queuelib = require('queuelib');
-    var myqueue = new Qlib(function(data,lib) {
-        console.log(data*2);
+.pushAsync(fn)
+--------------
+
+    var Q = require('queuelib');
+    var queue = new Q;
+    
+    queue.pushAsync(function(lib) {
+        // do something asynchronously
+        lib.done();
+    });
+    
+    queue.pushAsync(function(lib) {
+        // do something else asynchronously
         lib.done();
     });
 
-    myqueue.pushAsync(2);
-    myqueue.pushAsync(3);
-    myqueue.pushAsync(4);
-    myqueue.pushAsync(5);
-    myqueue.pushAsync(6);
-   
-    // 4
-    // 6
-    // 8
-    // 10
-    // 12
-    
-You can advance from anywhere
-=============================
+.series ([fn1,fn2,..])
+----------------------
 
-    var Queuelib = require('queuelib');
-    var myqueue = new Qlib(function(data) {
-        console.log(data*2);
-        doSomething();
+queue.series([
+    function(lib) {
+        // do something asynchronously
+        lib.done();
+    },
+    function(lib) {
+        // do something else asynchronously
+        lib.done();
+    }
+]);
+
+
+Example 1
+---------
+
+
+    var Q = require('queuelib');
+    var request = require('request');
+    var queue = new Q;
+    
+    queue.pushAsync(function(lib) {
+        // do something asynchronously
+        request('http://google.com',function(err,response,body) {
+            console.log(body);
+            lib.done();
+        });
+    });
+    
+    queue.pushAsync(function(lib) {
+        // do something else asynchronously
+        request('http://reddit.com',function(err,response,body) {
+            console.log(body);
+            lib.done();
+        });
+        lib.done();
     });
 
-    var doSomething = function() {
-        myqueue.done();
-    };
+Example 2
+---------
 
-    myqueue.pushAsync(2);
-    myqueue.pushAsync(3);
-    myqueue.pushAsync(4);
-    myqueue.pushAsync(5);
-    myqueue.pushAsync(6);
-    
-    // 4
-    // 6
-    // 8
-    // 10
-    // 12
-
-
-You can supply your own custom work function per push
-=====================================================
-
-q is passed as the last argument, just call .done() when done
-
-    myqueue.pushAsync({foo:42}, function(obj,q) {
-        var bar = obj.foo * 2; // 84
-        q.done();
-    });
+queue.series([
+    function(lib) {
+        console.log("getting xkcd");
+        request('http://xkcd.com',function(err,response,body) {
+            console.log(response.headers);
+            lib.done();
+        });
+    },
+    function(lib) {
+        console.log("getting nmpjs");
+        request('http://npmjs.org',function(err,response,body) {
+            console.log(response.headers);
+            lib.done();
+        });
+    }
+]);

@@ -6,9 +6,6 @@ function qlib(myWorkFunction) {
     var nextfn = function() { 
         if (queue.length > 0) {
             var item = queue[0];
-            if (item.type == 'sync') {
-                this.workSync();
-            }
             if (item.type == 'async') {
                 this.workAsync();
             }
@@ -16,38 +13,28 @@ function qlib(myWorkFunction) {
 	};
 	emitter.on('next',nextfn.bind(this));
 	if (emitter.listeners('done').length == 0) {
-		emitter.on('done',function() { console.log("Queue currently empty. All done.");});
+		emitter.on('done',function() { 
+            console.log("Queue currently empty. All done.");
+        });
 	} 
 	this.working = false;
-	this.workSync = function() {
-		var item = queue[0];
-		if (item) {
-			queue.shift();
-			var element = item.el;
-			var fn = item.fn || myWorkFunction;
-			fn.apply(fn,[element,this]);
-            emitter.emit('next');
-		} 
-	};
     this.workAsync = function() {
 		var item = queue[0];
 		if (item) {
 			queue.shift();
 			var element = item.el;
 			var fn = item.fn || myWorkFunction;
-			fn.apply(fn,[element,this]);
+            if (element === undefined)
+			    fn.apply(fn,[this]);
+            else 
+    			fn.apply(fn,[element,this]);
 		} 
 	};
-	this.pushSync = function(el,fn) {
-		queue.push({el:el,fn:fn,type:'sync'});
-		if ((queue.length > 0) && (this.working == false)) {
-			this.working = true;
-			this.workSync();
-        }
-		return this;
-	};
 	this.pushAsync = function(el,fn) {
-		queue.push({el:el,fn:fn,type:'async'});
+        if (arguments.length == 1) {
+		    queue.push({fn:el,type:'async'});
+        } else 
+            queue.push({el:el,fn:fn,type:'async'});
 		if ((queue.length > 0) && (this.working == false)) {
 			this.working = true;
 			this.workAsync();
@@ -60,7 +47,9 @@ function qlib(myWorkFunction) {
         this.working = false;
 		emitter.emit('next');
 	};
-	this.queue = function() {
-		return queue.slice(0);
-	};	
+    this.series = function(list) {
+        list.forEach(function(item) {
+            queue.push({fn:item,type:'async'});
+        });
+    }
 };
