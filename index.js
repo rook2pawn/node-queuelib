@@ -68,7 +68,7 @@ function qlib(myWorkFunction) {
 	};
     this.series = function(list) {
         list.forEach(function(item) {
-            queue.push({fn:item,type:'async'});
-        });
+            this.pushAsync(item);
+        },this);
     }
 };
