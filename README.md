@@ -84,3 +84,7 @@ Example 2
             });
         }
     ]);
+
+
+.pushSync(
+There is also .pushSync for 
