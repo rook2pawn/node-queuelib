@@ -1,16 +1,18 @@
 {
-    "author": "David Wee <rook2pawn@gmail.com> (http://rook2pawn.com)",
-    "name": "queuelib",
-    "description": "Straightforward asynchronous queue processor",
-    "version": "0.3.3",
-    "homepage": "https://github.com/rook2pawn/node-queuelib",
-    "repository": {
+  "author": "David Wee <rook2pawn@gmail.com> (http://rook2pawn.com)",
+  "name": "queuelib",
+  "description": "Straightforward asynchronous queue processor",
+  "version": "0.3.3",
+  "homepage": "https://github.com/rook2pawn/node-queuelib",
+  "repository": {
     "type": "git",
     "url": "git://github.com/rook2pawn/node-queuelib.git"
-    },
-    "main": "index.js",
-    "scripts": {
-        "test": "nodeunit test/test.js"
-    },
-    "devDependencies": {}
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "nodeunit test/test.js"
+  },
+  "devDependencies": {
+    "nodeunit": "^0.8.6"
+  }
 }
