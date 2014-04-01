@@ -1,3 +1,21 @@
+New!
+====
+Early termination flow control in .series! 
+        
+    queue.series([
+    function(lib,id) {
+        // stuff
+        lib.terminate(id);
+    },
+    function(lib) {
+        // will be removed
+    }
+    ]);
+
+.series will generate unique UUID's and enable removal on .terminate(id).
+
+
+
 QueueLib
 ========
 
