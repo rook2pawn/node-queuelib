@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/rook2pawn/node-queuelib.svg?branch=master)](https://travis-ci.org/rook2pawn/node-queuelib)
+
 New!
 ====
 Early termination flow control in .series! 

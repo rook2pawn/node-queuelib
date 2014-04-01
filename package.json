@@ -10,7 +10,7 @@
   },
   "main": "index.js",
   "scripts": {
-    "test": "nodeunit test/test.js"
+    "test": "nodeunit test/test-*.js"
   },
   "devDependencies": {
     "nodeunit": "^0.8.6",
