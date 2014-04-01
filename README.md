@@ -4,6 +4,7 @@ QueueLib
 Asynchronous queue processor
 
     - lightweight, simple
+    - flow control in series
 
 
 Methods
@@ -85,6 +86,41 @@ Example 2
         }
     ]);
 
+Terminating a series early
+==========================
 
-.pushSync(
-There is also .pushSync for 
+
+.terminate(id)
+------------
+
+On any series function, an id will be passed as a second parameter with which you can call .terminate(id)
+
+    queue.series([
+        function(lib) {
+            console.log("getting xkcd");
+            request('http://xkcd.com',function(err,response,body) {
+                console.log(response.request.host);
+                lib.done();
+            });
+        },
+        function(lib,id) {
+            console.log("getting nmpjs");
+            request('http://npmjs.org',function(err,response,body) {
+                console.log(response.request.host);
+                lib.terminate(id);
+            });
+        },
+        function(lib) {
+            console.log("getting perl");
+            request('http://perl.org',function(err,response,body) {
+                console.log(response.request.host);
+                lib.done();
+            });
+        }
+    ]);
+
+    queue.pushAsync(function(lib) {
+        console.log(list);
+        // ['xkcd.com','www.nmpjs.org']
+        lib.done();
+    });

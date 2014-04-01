@@ -3,14 +3,17 @@ exports = module.exports = qlib;
 
 function qlib(myWorkFunction) {
 	this.emitter = new EventEmitter;
-	var queue = [];
+	this.queue = [];
     var nextfn = function() { 
-        if (queue.length > 0) {
-            var item = queue[0];
+        if (this.queue.length > 0) {
+            var item = this.queue[0];
             if (item.type == 'sync') {
                 this.workSync();
             } else if (item.type == 'async') {
-                this.workAsync();
+                if (item.series) 
+                    this.workAsync_series();
+                else 
+                    this.workAsync();
             }
         }
 	};
@@ -22,7 +25,7 @@ function qlib(myWorkFunction) {
 	} 
 	this.working = false;
     this.workAsync = function() {
-        var item = queue.shift();
+        var item = this.queue.shift();
         if (item !== undefined) {
             this.working = true;
 			var fn = item.fn || myWorkFunction;
@@ -34,16 +37,37 @@ function qlib(myWorkFunction) {
 	};
 	this.pushAsync = function(el,fn) {
         if ((arguments.length == 1) && (typeof el == 'function')) {
-		    queue.push({fn:el,type:'async'});
+		    this.queue.push({fn:el,type:'async'});
         } else 
-            queue.push({el:el,fn:fn,type:'async'});
-		if ((queue.length > 0) && (this.working == false)) {
+            this.queue.push({el:el,fn:fn,type:'async'});
+		if ((this.queue.length > 0) && (this.working == false)) {
 			this.workAsync();
 		}
 		return this;
 	};
+    this.workAsync_series = function() {
+        var item = this.queue.shift();
+        if ((item !== undefined) && (item.series)) {
+            this.working = true;
+			var fn = item.fn || myWorkFunction;
+            var id = item.id;
+            if (item.el === undefined) {
+			    fn.apply(fn,[this,id]);
+            } else {
+                this.terminate = this.terminate.bind(s);
+    			fn.apply(fn,[item.el,this,id]);
+            }
+		} 
+	};
+	this.pushAsync_series = function(fn,id) {
+        this.queue.push({fn:fn,type:'async',id:id,series:true});
+		if ((this.queue.length > 0) && (this.working == false)) {
+			this.workAsync_series();
+		}
+		return this;
+	};
     this.workSync = function() {
-        var item = queue.shift();
+        var item = this.queue.shift();
         if (item !== undefined) {
             this.working = true;
 			var fn = item.fn || myWorkFunction;
@@ -55,10 +79,10 @@ function qlib(myWorkFunction) {
     };
     this.pushSync = function(el,fn) {
         if ((arguments.length == 1) && (typeof el == 'function')) {
-		    queue.push({fn:el,type:'sync'});
+		    this.queue.push({fn:el,type:'sync'});
         } else 
-            queue.push({el:el,fn:fn,type:'sync'});
-        if ((queue.length > 0) && (this.working == false)) {
+            this.queue.push({el:el,fn:fn,type:'sync'});
+        if ((this.queue.length > 0) && (this.working == false)) {
             this.workSync();
         }
     }
@@ -66,9 +90,24 @@ function qlib(myWorkFunction) {
         this.working = false;
 		this.emitter.emit('next');
 	};
+    this.terminate = function(id) {
+        var tmp = [];
+        for (var i = 0; i < this.queue.length; i++) {
+            var item = this.queue[i];
+            if ((item.id !== undefined) && (item.id == id)) {
+                // unsaved
+            } else {
+                tmp.push(item);
+            }
+        }
+        this.queue = tmp;
+        if (this.queue.length > 0) 
+            this.done();
+    };
     this.series = function(list) {
+        var id = String.fromCharCode(~~(Math.random() * 26) + 97).concat((Math.random()+1).toString(36).substr(2,5))
         list.forEach(function(item) {
-            this.pushAsync(item);
+            this.pushAsync_series(item,id);
         },this);
     }
 };
