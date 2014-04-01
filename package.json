@@ -13,6 +13,7 @@
     "test": "nodeunit test/test.js"
   },
   "devDependencies": {
-    "nodeunit": "^0.8.6"
+    "nodeunit": "^0.8.6",
+    "request": "^2.34.0"
   }
 }
