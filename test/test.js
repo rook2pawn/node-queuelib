@@ -1,10 +1,11 @@
 var Q = require('../');
 var request = require('request');
 var queue = new Q;
-
+var test = require('tape');
 var list = [];
-exports.testPushAsyncAndSeries = function(t) {
-    t.expect(1);
+
+test('testPushAsyncAndSeries',function(t) {
+    t.plan(1);
     queue.pushAsync(function(lib) {
         // do something asynchronously
         console.log("getting google");
@@ -48,7 +49,6 @@ exports.testPushAsyncAndSeries = function(t) {
         console.log("Testing if list matches content and order:");
         console.log(['www.google.com','www.reddit.com','xkcd.com','www.npmjs.org']);
         t.deepEqual(list,['www.google.com','www.reddit.com','xkcd.com','www.npmjs.org'])
-        t.done();
         lib.done();
     });
-}
+});

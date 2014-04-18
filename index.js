@@ -101,8 +101,12 @@ function qlib(myWorkFunction) {
             }
         }
         this.queue = tmp;
-        if (this.queue.length > 0) 
+        this.done();
+/*
+        if (this.queue.length > 0) {
             this.done();
+        }
+*/
     };
     this.series = function(list) {
         var id = String.fromCharCode(~~(Math.random() * 26) + 97).concat((Math.random()+1).toString(36).substr(2,5))
