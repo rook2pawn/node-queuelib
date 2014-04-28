@@ -2,7 +2,7 @@
   "author": "David Wee <rook2pawn@gmail.com> (http://rook2pawn.com)",
   "name": "queuelib",
   "description": "Straightforward asynchronous queue processor",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "homepage": "https://github.com/rook2pawn/node-queuelib",
   "repository": {
     "type": "git",
@@ -15,5 +15,8 @@
   "devDependencies": {
     "request": "^2.34.0",
     "tape": "^2.12.3"
+  },
+  "dependencies": {
+    "hashish": "0.0.4"
   }
 }

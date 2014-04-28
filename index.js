@@ -1,4 +1,5 @@
 var EventEmitter = require('events').EventEmitter;
+var Hash = require('hashish');
 exports = module.exports = qlib;
 
 function qlib(myWorkFunction) {
@@ -86,7 +87,14 @@ function qlib(myWorkFunction) {
             this.workSync();
         }
     }
-	this.done = function() {
+    this.hash = {};
+    this.get = function(key) {
+        return this.hash[key];
+    }
+	this.done = function(obj) {
+        if ((obj) && (typeof obj == 'object')) {
+            Hash(this.hash).update(obj);
+        }
         this.working = false;
 		this.emitter.emit('next');
 	};

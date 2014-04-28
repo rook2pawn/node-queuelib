@@ -2,6 +2,23 @@
 
 New!
 ====
+Key value store across series!
+
+    queue.series([
+        function(lib) {
+            lib.done({one:1})
+        },
+        function(lib) {
+            lib.done({two:2})
+        },
+        function(lib) {
+            var x = lib.get('one') + lib.get('two'); // x = 3
+            lib.done();
+        }
+    ]);
+
+New!
+====
 Early termination flow control in .series! 
         
     queue.series([
