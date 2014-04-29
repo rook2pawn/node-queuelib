@@ -2,7 +2,7 @@
 
 New!
 ====
-Key value store across series!
+Key value store across series! Just call .done(hash) to store the keys/values of the hash
 
     queue.series([
         function(lib) {
@@ -16,6 +16,25 @@ Key value store across series!
             lib.done();
         }
     ]);
+
+
+You can also use .set(hash)
+
+    queue.series([
+        function(lib) {
+            lib.set({one:1});
+            lib.done()
+        },
+        function(lib) {
+            lib.set({life:42})
+            lib.done()
+        },
+        function(lib) {
+            t.equal(43,lib.get('one') + lib.get('life'));
+            lib.done();
+        }
+    ]);
+
 
 New!
 ====

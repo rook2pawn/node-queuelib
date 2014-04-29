@@ -91,6 +91,12 @@ function qlib(myWorkFunction) {
     this.get = function(key) {
         return this.hash[key];
     }
+    this.set = function(obj) {
+        if ((obj) && (typeof obj == 'object')) {
+            Hash(this.hash).update(obj);
+        }
+        return true;
+    }
 	this.done = function(obj) {
         if ((obj) && (typeof obj == 'object')) {
             Hash(this.hash).update(obj);
