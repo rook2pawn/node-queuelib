@@ -1,6 +1,6 @@
 var test = require('tape');
 
-test('testPushAsyncAndSeries',function(t) {
+test('testWaterfall',function(t) {
     t.plan(1);
     var Q = require('../');
     var queue = new Q;
