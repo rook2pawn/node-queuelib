@@ -16,6 +16,9 @@ function qlib(myWorkFunction) {
                 else 
                     this.workAsync();
             }
+        } else {
+            if (this.alldone !== undefined)
+                this.alldone()
         }
 	};
 	this.emitter.on('next',nextfn.bind(this));
@@ -25,22 +28,27 @@ function qlib(myWorkFunction) {
         });
 	} 
 	this.working = false;
+    this.current_each_alldone = '';
     this.workAsync = function() {
         var item = this.queue.shift();
+        if (item.id)
+            this.current_alldone = item.id
         if (item !== undefined) {
             this.working = true;
 			var fn = item.fn || myWorkFunction;
-            if (item.el === undefined)
+            if (item.idx !== undefined)
+    			fn.apply(fn,[item.el,item.idx,this]);
+            else if (item.el === undefined)
 			    fn.apply(fn,[this]);
-            else 
-    			fn.apply(fn,[item.el,this]);
-		} 
+		}
 	};
-	this.pushAsync = function(el,fn) {
+	this.pushAsync = function(el,fn,idx,id) {
         if ((arguments.length == 1) && (typeof el == 'function')) {
 		    this.queue.push({fn:el,type:'async'});
-        } else 
+        } else if (arguments.length == 2)
             this.queue.push({el:el,fn:fn,type:'async'});
+        else if (arguments.length == 4)
+            this.queue.push({el:el,fn:fn,idx:idx,id:id,type:'async'});
 		if ((this.queue.length > 0) && (this.working == false)) {
 			this.workAsync();
 		}
@@ -97,7 +105,22 @@ function qlib(myWorkFunction) {
         }
         return true;
     }
+    var getCount = function(list,id) {
+        var count = 0;
+        list.forEach(function(item) {
+            if ((item.id) && (item.id == id))
+                count++
+        })
+        return count
+    }
 	this.done = function(obj) {
+        // this is for forEach
+        if (this.current_alldone != '') {
+            var count = getCount(this.queue,this.current_alldone)
+            if (count == 0)
+                this.donemap[this.current_alldone]()
+        }
+        // generally
         if ((obj) && (typeof obj == 'object')) {
             Hash(this.hash).update(obj);
         }
@@ -122,10 +145,51 @@ function qlib(myWorkFunction) {
         }
 */
     };
+    var gen_id = function() {
+        return String.fromCharCode(~~(Math.random() * 26) + 97).concat((Math.random()+1).toString(36).substr(2,5))
+    }
     this.series = function(list) {
-        var id = String.fromCharCode(~~(Math.random() * 26) + 97).concat((Math.random()+1).toString(36).substr(2,5))
+        var id = gen_id()
         list.forEach(function(item) {
             this.pushAsync_series(item,id);
         },this);
+        return id
     }
+    this._list = [];
+    this.list = function(list) {
+        this._list = list;
+        return this
+    }
+    this.donemap = {}
+    this.forEach = function(iterator,alldone) {
+        var id = gen_id();    
+        this.donemap[id] = alldone
+        this._list.forEach(function(item,idx) {
+            this.pushAsync(item,iterator,idx,id)
+        },this)
+    }
+/*
+async.each = function (arr, iterator, callback) {
+        callback = callback || function () {};
+        if (!arr.length) {
+            return callback();
+        }
+        var completed = 0;
+        _each(arr, function (x) {
+            iterator(x, only_once(done) );
+        });
+        function done(err) {
+          if (err) {
+              callback(err);
+              callback = function () {};
+          }
+          else {
+              completed += 1;
+              if (completed >= arr.length) {
+                  callback();
+              }
+          }
+        }
+    };
+*/
 };

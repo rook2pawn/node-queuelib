@@ -1,6 +1,20 @@
 [![Build Status](https://travis-ci.org/rook2pawn/node-queuelib.svg?branch=master)](https://travis-ci.org/rook2pawn/node-queuelib)
 
 New!
+==== 
+Asynchronous forEach! Just supply a *list*, an *iterator*, and a *end_callback* when the entire forEach chain is finished.
+
+    queue.list(<list>).forEach(<iterator>).end(<end_cb>)
+
+    // e.g.
+    queue.list(['a','b','c']).forEach(function(item,idx,lib) {
+        // do something asynchronous
+        lib.done()
+    },function() {
+        console.log("all done!")
+    })
+
+New!
 ====
 Key value store across series! Just call .done(hash) to store the keys/values of the hash
 
