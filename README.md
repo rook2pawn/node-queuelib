@@ -7,10 +7,13 @@ Asynchronous forEach! Just supply a *list*, an *iterator*, and a *end_callback* 
     queue.list(<list>).forEach(<iterator>).end(<end_cb>)
 
     // e.g.
-    queue.list(['a','b','c']).forEach(function(item,idx,lib) {
+    queue
+    .list(['a','b','c'])
+    .forEach(function(item,idx,lib) {
         // do something asynchronous
         lib.done()
-    },function() {
+    })
+    .end(function() {
         console.log("all done!")
     })
 

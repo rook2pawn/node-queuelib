@@ -8,22 +8,28 @@ test('forEach',function(t) {
     var list = ['a','b','c','d','e']
     t.plan(list.length*2 + 1)
     var time_first, time_second
-    queue.list(list).forEach(function(item,idx,lib) {
+    queue
+    .list(list)
+    .forEach(function(item,idx,lib) {
         setTimeout(function() {
             console.log(item)
             t.equal(item, list[idx])
             lib.done()
         },500)
-    },function() {
+    })
+    .end(function() {
         time_first = new Date().getTime()
     })
-    queue.list(list).forEach(function(item,idx,lib) {
+    queue
+    .list(list)
+    .forEach(function(item,idx,lib) {
         setTimeout(function() {
             console.log(item.toUpperCase())
             t.equal(item, list[idx])
             lib.done()
         },10)
-    },function() {
+    })
+    .end(function() {
         time_second = new Date().getTime()
         console.log(time_second - time_first)
         t.ok((time_second - time_first) > (list.length * 10),'Ensure that the second call back happened after the first, and that elapsed time total of the second forEach is correct')

@@ -159,12 +159,17 @@ function qlib(myWorkFunction) {
         this._list = list;
         return this
     }
+    this._iterator;
     this.donemap = {}
-    this.forEach = function(iterator,alldone) {
+    this.forEach = function(iterator) {
+        this._iterator = iterator
+        return this
+    }
+    this.end = function(alldone) {
         var id = gen_id();    
         this.donemap[id] = alldone
         this._list.forEach(function(item,idx) {
-            this.pushAsync(item,iterator,idx,id)
+            this.pushAsync(item,this._iterator,idx,id)
         },this)
     }
 };
