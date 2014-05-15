@@ -8,14 +8,14 @@ Asynchronous forEach! Just supply a *list*, an *iterator*, and a *end_callback* 
 
     // e.g.
     queue
-    .list(['a','b','c'])
-    .forEach(function(item,idx,lib) {
+     .list(['a','b','c'])
+     .forEach(function(item,idx,lib) {
         // do something asynchronous
         lib.done()
-    })
-    .end(function() {
+     })
+     .end(function() {
         console.log("all done!")
-    })
+     })
 
 New!
 ====
