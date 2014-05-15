@@ -4,6 +4,7 @@ exports = module.exports = qlib;
 
 function qlib(myWorkFunction) {
 	this.emitter = new EventEmitter;
+    this.current_alldone = ''
 	this.queue = [];
     var nextfn = function() { 
         if (this.queue.length > 0) {
@@ -117,8 +118,11 @@ function qlib(myWorkFunction) {
         // this is for forEach
         if (this.current_alldone != '') {
             var count = getCount(this.queue,this.current_alldone)
-            if (count == 0)
+            if (count == 0) {
                 this.donemap[this.current_alldone]()
+                delete this.donemap[this.current_alldone]
+                this.current_alldone = ''
+            }
         }
         // generally
         if ((obj) && (typeof obj == 'object')) {
@@ -139,11 +143,6 @@ function qlib(myWorkFunction) {
         }
         this.queue = tmp;
         this.done();
-/*
-        if (this.queue.length > 0) {
-            this.done();
-        }
-*/
     };
     var gen_id = function() {
         return String.fromCharCode(~~(Math.random() * 26) + 97).concat((Math.random()+1).toString(36).substr(2,5))
@@ -168,28 +167,4 @@ function qlib(myWorkFunction) {
             this.pushAsync(item,iterator,idx,id)
         },this)
     }
-/*
-async.each = function (arr, iterator, callback) {
-        callback = callback || function () {};
-        if (!arr.length) {
-            return callback();
-        }
-        var completed = 0;
-        _each(arr, function (x) {
-            iterator(x, only_once(done) );
-        });
-        function done(err) {
-          if (err) {
-              callback(err);
-              callback = function () {};
-          }
-          else {
-              completed += 1;
-              if (completed >= arr.length) {
-                  callback();
-              }
-          }
-        }
-    };
-*/
 };
