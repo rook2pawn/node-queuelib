@@ -35,3 +35,22 @@ test('forEach',function(t) {
         t.ok((time_second - time_first) > (list.length * 10),'Ensure that the second call back happened after the first, and that elapsed time total of the second forEach is correct')
     })
 })
+
+
+test('empty forEach',function(t) {
+    var Q = require('../');
+    var queue = new Q;
+    var list = []
+    t.plan(1)
+    queue
+    .list(list)
+    .forEach(function(item,idx,lib) {
+        setTimeout(function() {
+            console.log(item)
+            lib.done()
+        },500)
+    })
+    .end(function() {
+        t.pass("Sure");
+    })
+})

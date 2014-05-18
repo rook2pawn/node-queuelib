@@ -167,9 +167,15 @@ function qlib(myWorkFunction) {
     }
     this.end = function(alldone) {
         var id = gen_id();    
-        this.donemap[id] = alldone
-        this._list.forEach(function(item,idx) {
-            this.pushAsync(item,this._iterator,idx,id)
-        },this)
+        this.donemap[id] = alldone || function() {}
+        if (this._list.length)
+            this._list.forEach(function(item,idx) {
+                this.pushAsync(item,this._iterator,idx,id)
+            },this)
+        else {
+            this.donemap[id]()
+            delete this.donemap[id]
+        }
+            
     }
 };
