@@ -76,6 +76,27 @@ function qlib(myWorkFunction) {
 		}
 		return this;
 	};
+    this.workAsync_each = function() {
+        var item = this.queue.shift();
+        if ((item !== undefined) && (item.each)) {
+            this.working = true;
+			var fn = item.fn;
+            var id = item.id;
+            if (item.el === undefined) {
+			    fn.apply(fn,[this,id]);
+            } else {
+                this.terminate = this.terminate.bind(s);
+    			fn.apply(fn,[item.el,this,id]);
+            }
+		} 
+	};
+	this.pushAsync_each = function(params) {
+        this.queue.push({fn:params.fn,padding:params.padding,type:'async',id:params.id,each:true,el:params.arg});
+		if ((this.queue.length > 0) && (this.working == false)) {
+			this.workAsync_each();
+		}
+		return this;
+	};
     this.workSync = function() {
         var item = this.queue.shift();
         if (item !== undefined) {
@@ -115,15 +136,6 @@ function qlib(myWorkFunction) {
         return count
     }
 	this.done = function(obj) {
-        // this is for forEach
-        if (this.current_alldone != '') {
-            var count = getCount(this.queue,this.current_alldone)
-            if (count == 0) {
-                this.donemap[this.current_alldone]()
-                delete this.donemap[this.current_alldone]
-                this.current_alldone = ''
-            }
-        }
         // generally
         if ((obj) && (typeof obj == 'object')) {
             Hash(this.hash).update(obj);
@@ -154,16 +166,29 @@ function qlib(myWorkFunction) {
         },this);
         return id
     }
-    this._list = [];
-    this.list = function(list) {
-        this._list = list;
+
+/*
+        // this is for forEach
+        if (this.current_alldone != '') {
+            var count = getCount(this.queue,this.current_alldone)
+            if (count == 0) {
+                this.donemap[this.current_alldone]()
+                delete this.donemap[this.current_alldone]
+                this.current_alldone = ''
+            }
+        }
+
+*/
+    this.forEach = function(params,done) {
+        var list = params.list;
+        var iterator = params.iterator;
+        var padding = params.padding || 100;
+        var id = gen_id();    
+        list.forEach(function(arg) {
+            this.pushAsync_each({fn:iterator,arg:arg,id:id,padding:padding});
+        },this);
         return this
-    }
-    this._iterator;
-    this.donemap = {}
-    this.forEach = function(iterator) {
-        this._iterator = iterator
-        return this
+        // push onto queue {fn : iterator, arglist: list[i] (active argument), padding:1000 (num milliseconds) }
     }
     this.end = function(alldone) {
         var id = gen_id();    
