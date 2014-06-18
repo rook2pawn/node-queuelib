@@ -7,21 +7,18 @@ function qlib() {
 	this.working = false;
     this.workAsync = function() {
         var item = this.queue.shift();
+        var x = function() {
+            if (item.arg !== undefined) 
+                item.fn.apply({},[item.arg,this,item.id]);
+            else 
+                item.fn.apply({},[this,item.id]);
+        };
         if (item !== undefined) {
             this.working = true;
             if ((item.padding !== undefined) && (item.padding > 0)) {
-                var x = function() {
-                    if (item.arg !== undefined) 
-                        item.fn.apply({},[item.arg,this,item.id]);
-                    else 
-                        item.fn.apply({},[this,item.id]);
-                };
                 setTimeout(x.bind(this), item.padding)
             } else {
-                if (item.arg !== undefined) 
-                    item.fn.apply({},[item.arg,this,item.id]);
-                else 
-                    item.fn.apply({},[this,item.id]);
+                x.call(this)
             }
 		} 
 	};
