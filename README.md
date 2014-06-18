@@ -1,21 +1,31 @@
 [![Build Status](https://travis-ci.org/rook2pawn/node-queuelib.svg?branch=master)](https://travis-ci.org/rook2pawn/node-queuelib)
 
 New!
+===
+Rate Limiting. Just supply the millisecond after .forEach or .series
+
+    q.series(<list>,<padding>);
+
+    // or
+
+    q.forEach(<list>,<iterator>,<all done>, <padding>)
+
+
+New!
 ==== 
-Asynchronous forEach! Just supply a *list*, an *iterator*, and a *end_callback* when the entire forEach chain is finished.
+ForEach
 
-    queue.list(<list>).forEach(<iterator>).end(<end_cb>)
+q.forEach(<list>,<iterator>,<all done>)
+--------------------------------------------------
 
-    // e.g.
-    queue
-     .list(['a','b','c'])
-     .forEach(function(item,idx,lib) {
-        // do something asynchronous
-        lib.done()
-     })
-     .end(function() {
-        console.log("all done!")
-     })
+    q.forEach([1,2,3],function(val, lib) {
+        console.log(val);
+    }, function() {
+        console.log("all done");
+    });
+
+    // 1 2 3
+
 
 New!
 ====

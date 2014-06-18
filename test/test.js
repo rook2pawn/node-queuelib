@@ -7,48 +7,36 @@ var list = [];
 test('testPushAsyncAndSeries',function(t) {
     t.plan(1);
     queue.pushAsync(function(lib) {
-        // do something asynchronously
-        console.log("getting google");
-        request('http://google.com',function(err,response,body) {
-            console.log(response.request.host);
-            list.push(response.request.host);
+        setTimeout(function() {
+            list.push(1);
             lib.done();
-        });
+        },100);
     });
 
     queue.pushAsync(function(lib) {
-        // do something else asynchronously
-        console.log("getting reddit");
-        request('http://reddit.com',function(err,response,body) {
-            console.log(response.request.host);
-            list.push(response.request.host);
+        setTimeout(function() {
+            list.push(2);
             lib.done();
-        });
+        },100);
     });
 
 
     queue.series([
         function(lib) {
-            console.log("getting xkcd");
-            request('http://xkcd.com',function(err,response,body) {
-                console.log(response.request.host);
-                list.push(response.request.host);
+            setTimeout(function() {
+                list.push(3);
                 lib.done();
-            });
+            },100);
         },
         function(lib) {
-            console.log("getting nmpjs");
-            request('http://npmjs.org',function(err,response,body) {
-                console.log(response.request.host);
-                list.push(response.request.host);
+            setTimeout(function() {
+                list.push(4);
                 lib.done();
-            });
-        }
+            },100);
+        },
     ]);
     queue.pushAsync(function(lib) {
-        console.log("Testing if list matches content and order:");
-        console.log(['www.google.com','www.reddit.com','xkcd.com','www.npmjs.org']);
-        t.deepEqual(list,['www.google.com','www.reddit.com','xkcd.com','www.npmjs.org'])
+        t.deepEqual(list,[1,2,3,4])
         lib.done();
     });
 });

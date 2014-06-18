@@ -2,46 +2,28 @@ var EventEmitter = require('events').EventEmitter;
 var Hash = require('hashish');
 exports = module.exports = qlib;
 
-function qlib(myWorkFunction) {
-	this.emitter = new EventEmitter;
-    this.current_alldone = ''
+function qlib() {
 	this.queue = [];
-    var nextfn = function() { 
-        if (this.queue.length > 0) {
-            var item = this.queue[0];
-            if (item.type == 'sync') {
-                this.workSync();
-            } else if (item.type == 'async') {
-                if (item.series) 
-                    this.workAsync_series();
-                else 
-                    this.workAsync();
-            }
-        } else {
-            if (this.alldone !== undefined)
-                this.alldone()
-        }
-	};
-	this.emitter.on('next',nextfn.bind(this));
-	if (this.emitter.listeners('done').length == 0) {
-		this.emitter.on('done',function() { 
-            console.log("Queue currently empty. All done.");
-        });
-	} 
 	this.working = false;
-    this.current_each_alldone = '';
     this.workAsync = function() {
         var item = this.queue.shift();
-        if (item.id)
-            this.current_alldone = item.id
         if (item !== undefined) {
             this.working = true;
-			var fn = item.fn || myWorkFunction;
-            if (item.idx !== undefined)
-    			fn.apply(fn,[item.el,item.idx,this]);
-            else if (item.el === undefined)
-			    fn.apply(fn,[this]);
-		}
+            if ((item.padding !== undefined) && (item.padding > 0)) {
+                var x = function() {
+                    if (item.arg !== undefined) 
+                        item.fn.apply({},[item.arg,this,item.id]);
+                    else 
+                        item.fn.apply({},[this,item.id]);
+                };
+                setTimeout(x.bind(this), item.padding)
+            } else {
+                if (item.arg !== undefined) 
+                    item.fn.apply({},[item.arg,this,item.id]);
+                else 
+                    item.fn.apply({},[this,item.id]);
+            }
+		} 
 	};
 	this.pushAsync = function(el,fn,idx,id) {
         if ((arguments.length == 1) && (typeof el == 'function')) {
@@ -55,58 +37,17 @@ function qlib(myWorkFunction) {
 		}
 		return this;
 	};
-    this.workAsync_series = function() {
-        var item = this.queue.shift();
-        if ((item !== undefined) && (item.series)) {
-            this.working = true;
-			var fn = item.fn || myWorkFunction;
-            var id = item.id;
-            if (item.el === undefined) {
-			    fn.apply(fn,[this,id]);
-            } else {
-                this.terminate = this.terminate.bind(s);
-    			fn.apply(fn,[item.el,this,id]);
-            }
-		} 
-	};
-	this.pushAsync_series = function(fn,id) {
-        this.queue.push({fn:fn,type:'async',id:id,series:true});
-		if ((this.queue.length > 0) && (this.working == false)) {
-			this.workAsync_series();
-		}
-		return this;
-	};
-    this.workAsync_each = function() {
-        var item = this.queue.shift();
-        if ((item !== undefined) && (item.each)) {
-            this.working = true;
-			var fn = item.fn;
-            var id = item.id;
-            if (item.el === undefined) {
-			    fn.apply(fn,[this,id]);
-            } else {
-                this.terminate = this.terminate.bind(s);
-    			fn.apply(fn,[item.el,this,id]);
-            }
-		} 
-	};
-	this.pushAsync_each = function(params) {
-        this.queue.push({fn:params.fn,padding:params.padding,type:'async',id:params.id,each:true,el:params.arg});
-		if ((this.queue.length > 0) && (this.working == false)) {
-			this.workAsync_each();
-		}
-		return this;
-	};
     this.workSync = function() {
         var item = this.queue.shift();
         if (item !== undefined) {
             this.working = true;
-			var fn = item.fn || myWorkFunction;
+			var fn = item.fn;
             if (item.el === undefined)
 			    fn.apply(fn,[this]);
             else 
     			fn.apply(fn,[item.el,this]);
         } 
+        this.done()
     };
     this.pushSync = function(el,fn) {
         if ((arguments.length == 1) && (typeof el == 'function')) {
@@ -141,7 +82,13 @@ function qlib(myWorkFunction) {
             Hash(this.hash).update(obj);
         }
         this.working = false;
-		this.emitter.emit('next');
+        if (this.queue.length > 0) {
+            var item = this.queue[0];
+            if (item.type == 'sync')
+                this.workSync();
+            else if (item.type == 'async')
+                this.workAsync();
+        } 
 	};
     this.terminate = function(id) {
         var tmp = [];
@@ -159,48 +106,29 @@ function qlib(myWorkFunction) {
     var gen_id = function() {
         return String.fromCharCode(~~(Math.random() * 26) + 97).concat((Math.random()+1).toString(36).substr(2,5))
     }
-    this.series = function(list) {
+    this.series = function(list,padding) {
+        if (padding === undefined) 
+            padding = 0
         var id = gen_id()
-        list.forEach(function(item) {
-            this.pushAsync_series(item,id);
+        list.forEach(function(fn) {
+            this.queue.push({fn:fn,type:'async',id:id});
+            if ((this.queue.length > 0) && (this.working == false)) {
+                this.workAsync();
+            }
         },this);
         return id
     }
-
-/*
-        // this is for forEach
-        if (this.current_alldone != '') {
-            var count = getCount(this.queue,this.current_alldone)
-            if (count == 0) {
-                this.donemap[this.current_alldone]()
-                delete this.donemap[this.current_alldone]
-                this.current_alldone = ''
+    this.forEach = function(list, iterator, done, padding) {
+        var id = gen_id()
+        if (padding === undefined) 
+            padding = 0
+        list.forEach(function(arg,idx) {
+            this.queue.push({fn:iterator,type:'async',id:id,arg:arg,padding:padding})
+            if ((this.queue.length > 0) && (this.working == false)) {
+                this.workAsync();
             }
-        }
-
-*/
-    this.forEach = function(params,done) {
-        var list = params.list;
-        var iterator = params.iterator;
-        var padding = params.padding || 100;
-        var id = gen_id();    
-        list.forEach(function(arg) {
-            this.pushAsync_each({fn:iterator,arg:arg,id:id,padding:padding});
-        },this);
-        return this
-        // push onto queue {fn : iterator, arglist: list[i] (active argument), padding:1000 (num milliseconds) }
-    }
-    this.end = function(alldone) {
-        var id = gen_id();    
-        this.donemap[id] = alldone || function() {}
-        if (this._list.length)
-            this._list.forEach(function(item,idx) {
-                this.pushAsync(item,this._iterator,idx,id)
-            },this)
-        else {
-            this.donemap[id]()
-            delete this.donemap[id]
-        }
-            
+            if (idx == list.length - 1) 
+                this.queue.push({fn:done, type:'sync'})
+        },this)
     }
 };

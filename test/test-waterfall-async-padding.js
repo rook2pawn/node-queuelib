@@ -1,5 +1,5 @@
 var test = require('tape');
-test('testWaterfallAsync',function(t) {
+test('testWaterfallAsyncWithPadding',function(t) {
     t.plan(1);
     var Q = require('../');
     var queue = new Q;
@@ -19,5 +19,5 @@ test('testWaterfallAsync',function(t) {
             t.equal(4,x);
             lib.done();
         }
-    ]);
+    ],1000);
 });
