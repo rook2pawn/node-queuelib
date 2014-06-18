@@ -94,7 +94,7 @@ Methods
 =======
 
 .pushAsync(fn)
---------------
+==============
 
     var Q = require('queuelib');
     var queue = new Q;
@@ -110,7 +110,7 @@ Methods
     });
 
 .series ([fn1,fn2,..])
-----------------------
+======================
 
 queue.series([
     function(lib) {
@@ -148,3 +148,16 @@ Example 1
         });
         lib.done();
     });
+
+
+.forEach (list, iterator, alldone) 
+==================================
+
+    var list = [1,2,3]
+    var sum = 0;
+    queue.forEach(list,function(item,lib) {
+        sum += item;
+        lib.done()
+    },function() {
+        console.log(sum) // 6
+    })
