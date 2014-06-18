@@ -1,5 +1,4 @@
 var Q = require('../');
-var request = require('request');
 var queue = new Q;
 var test = require('tape');
 var list = [];
