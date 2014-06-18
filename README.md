@@ -73,12 +73,12 @@ Early termination flow control in .series!
         lib.terminate(id);
     },
     function(lib) {
-        // will be removed
+        // this function will be removed from the queue after the call to terminate
+    },
+    function(lib) {
+        // so will this one  , etc
     }
     ]);
-
-.series will generate unique UUID's and enable removal on .terminate(id).
-
 
 
 QueueLib
@@ -146,64 +146,5 @@ Example 1
             console.log(body);
             lib.done();
         });
-        lib.done();
-    });
-
-Example 2
----------
-
-    queue.series([
-        function(lib) {
-            console.log("getting xkcd");
-            request('http://xkcd.com',function(err,response,body) {
-                console.log(response.headers);
-                lib.done();
-            });
-        },
-        function(lib) {
-            console.log("getting nmpjs");
-            request('http://npmjs.org',function(err,response,body) {
-                console.log(response.headers);
-                lib.done();
-            });
-        }
-    ]);
-
-Terminating a series early
-==========================
-
-
-.terminate(id)
-------------
-
-On any series function, an id will be passed as a second parameter with which you can call .terminate(id)
-
-    queue.series([
-        function(lib) {
-            console.log("getting xkcd");
-            request('http://xkcd.com',function(err,response,body) {
-                console.log(response.request.host);
-                lib.done();
-            });
-        },
-        function(lib,id) {
-            console.log("getting nmpjs");
-            request('http://npmjs.org',function(err,response,body) {
-                console.log(response.request.host);
-                lib.terminate(id);
-            });
-        },
-        function(lib) {
-            console.log("getting perl");
-            request('http://perl.org',function(err,response,body) {
-                console.log(response.request.host);
-                lib.done();
-            });
-        }
-    ]);
-
-    queue.pushAsync(function(lib) {
-        console.log(list);
-        // ['xkcd.com','www.nmpjs.org']
         lib.done();
     });
