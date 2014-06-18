@@ -15,7 +15,7 @@ New!
 ==== 
 ForEach
 
-q.forEach(<list>,<iterator>,<all done>)
+q.forEach(list,iterator,alldone)
 --------------------------------------------------
 
     q.forEach([1,2,3],function(val, lib) {
