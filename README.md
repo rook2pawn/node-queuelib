@@ -18,13 +18,15 @@ ForEach
 q.forEach(list,iterator,alldone)
 --------------------------------------------------
 
-    q.forEach([1,2,3],function(val, lib) {
-        console.log(val);
+    q.forEach(['c','a','t'],function(val,idx,lib) {
+        console.log(val, idx);
     }, function() {
         console.log("all done");
     });
 
-    // 1 2 3
+    // c 0
+    // a 1 
+    // t 2
 
 
 New!
@@ -68,9 +70,9 @@ New!
 Early termination flow control in .series! 
         
     queue.series([
-    function(lib,id) {
+    function(lib) {
         // stuff
-        lib.terminate(id);
+        lib.terminate();
     },
     function(lib) {
         // this function will be removed from the queue after the call to terminate
@@ -155,7 +157,7 @@ Example 1
 
     var list = [1,2,3]
     var sum = 0;
-    queue.forEach(list,function(item,lib) {
+    queue.forEach(list,function(item,idx,lib) {
         sum += item;
         lib.done()
     },function() {

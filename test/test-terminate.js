@@ -12,10 +12,10 @@ test('terminate test', function (t) {
                 lib.done();
             },100);
         },
-        function(lib,id) {
+        function(lib) {
             setTimeout(function() {
                 list.push(2);
-                lib.terminate(id);
+                lib.terminate();
             },100);
         },
         function(lib) {
@@ -40,7 +40,7 @@ test('terminate test', function (t) {
         },
         function(lib,id) {
             t.deepEqual(list,[1,2,1,2]);
-            lib.terminate(id);
+            lib.terminate();
         },
         function(lib) {
             t.fail('YOU SHOULD NEVER SEE THIS MESSAGE');

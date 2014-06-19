@@ -8,10 +8,13 @@ function qlib() {
     this.workAsync = function() {
         var item = this.queue.shift();
         var x = function() {
-            if (item.arg !== undefined) 
-                item.fn.apply({},[item.arg,this,item.id]);
+            var self = this;
+            self._id = item.id;
+            self.terminate = this.terminate.bind(self)
+            if ((item.arg !== undefined) && (item.idx !== undefined))
+                item.fn.apply({},[item.arg,item.idx,self]);
             else 
-                item.fn.apply({},[this,item.id]);
+                item.fn.apply({},[self]);
         };
         if (item !== undefined) {
             this.working = true;
@@ -87,7 +90,8 @@ function qlib() {
                 this.workAsync();
         } 
 	};
-    this.terminate = function(id) {
+    this.terminate = function() {
+        var id = this._id
         var tmp = [];
         for (var i = 0; i < this.queue.length; i++) {
             var item = this.queue[i];
@@ -120,12 +124,12 @@ function qlib() {
         if (padding === undefined) 
             padding = 0
         list.forEach(function(arg,idx) {
-            this.queue.push({fn:iterator,type:'async',id:id,arg:arg,padding:padding})
+            this.queue.push({fn:iterator,type:'async',idx:idx,id:id,arg:arg,padding:padding})
             if ((this.queue.length > 0) && (this.working == false)) {
                 this.workAsync();
             }
             if (idx == list.length - 1) 
-                this.queue.push({fn:done, type:'sync'})
+                this.queue.push({fn:done, idx:idx,id:id,type:'sync'})
         },this)
     }
 };
