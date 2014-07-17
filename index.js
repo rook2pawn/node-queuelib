@@ -125,11 +125,10 @@ function qlib() {
             padding = 0
         list.forEach(function(arg,idx) {
             this.queue.push({fn:iterator,type:'async',idx:idx,id:id,arg:arg,padding:padding})
-            if ((this.queue.length > 0) && (this.working == false)) {
-                this.workAsync();
-            }
-            if (idx == list.length - 1) 
+            if (idx == list.length - 1)
                 this.queue.push({fn:done, idx:idx,id:id,type:'sync'})
+            if ((this.queue.length > 0) && (this.working == false))
+                this.workAsync();
         },this)
     }
 };
