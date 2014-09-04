@@ -13,6 +13,7 @@
     "test": "tape test/test*.js"
   },
   "devDependencies": {
+    "memwatch": "^0.2.2",
     "tape": "^2.12.3"
   },
   "dependencies": {
