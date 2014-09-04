@@ -113,10 +113,10 @@ function qlib() {
         var id = gen_id()
         list.forEach(function(fn) {
             this.queue.push({fn:fn,type:'async',id:id});
-            if ((this.queue.length > 0) && (this.working == false)) {
-                this.workAsync();
-            }
         },this);
+        if ((this.queue.length > 0) && (this.working == false)) {
+            this.workAsync();
+        }
         return id
     }
     this.forEach = function(list, iterator, done, padding) {

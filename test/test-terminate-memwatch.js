@@ -10,9 +10,8 @@ String.prototype.repeat = function( num )
     return new Array( num + 1 ).join( this );
 }
 test('terminate test', function (t) {
-    t.plan(1);
+    t.plan(500);
     var doSomething= function () {
-        console.log("doSomething", new Date())
         var x = 10e5;
         var q = new Q;
         q.series([
@@ -23,18 +22,16 @@ test('terminate test', function (t) {
             },
             function(lib) {
                 lib.set({baz:"cat".repeat(x)})
-                console.log(arguments) 
                 lib.terminate()
             },
             function(lib) {
-                console.log("WTF")
-                t.equal(1,2)
+                console.log("this should not happen")
+                t.fail()
                 lib.done()
             }
         ])
     }
-    doSomething()
-//    for (var i = 0; i < 500; i++) {
-//        doSomething();
-//    }
+    for (var i = 0; i < 500; i++) {
+        doSomething();
+    }
 });
