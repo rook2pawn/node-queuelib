@@ -1,10 +1,6 @@
 var Q = require('../');
 var list = [];
 var test = require('tape');
-var memwatch = require('memwatch')
-memwatch.on('leak',function(info) {
-    console.log("\n**********\nMemory leak", info)
-})
 String.prototype.repeat = function( num )
 {
     return new Array( num + 1 ).join( this );
