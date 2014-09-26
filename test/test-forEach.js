@@ -27,3 +27,11 @@ tape('test forEach',function(t) {
         t.ok((curr_time - start_time) < 1100)
     },100)
 })
+
+tape('test foreach miscellaneous',function(t) {
+    t.plan(1)
+    var q = new Q;
+    var x;
+    q.forEach(x)
+    t.ok(true)
+})

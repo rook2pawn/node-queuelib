@@ -121,14 +121,18 @@ function qlib() {
     }
     this.forEach = function(list, iterator, done, padding) {
         var id = gen_id()
+        if (done === undefined)
+            done = function() { console.log ("All done.") }
         if (padding === undefined) 
             padding = 0
-        list.forEach(function(arg,idx) {
-            this.queue.push({fn:iterator,type:'async',idx:idx,id:id,arg:arg,padding:padding})
-            if (idx == list.length - 1)
-                this.queue.push({fn:done, idx:idx,id:id,type:'sync'})
-            if ((this.queue.length > 0) && (this.working == false))
-                this.workAsync();
-        },this)
+        if (list) 
+            list.forEach(function(arg,idx) {
+                this.queue.push({fn:iterator,type:'async',idx:idx,id:id,arg:arg,padding:padding})
+                if (idx == list.length - 1)
+                    this.queue.push({fn:done, idx:idx,id:id,type:'sync'})
+                if ((this.queue.length > 0) && (this.working == false))
+                    this.workAsync();
+            },this)
+        else done()
     }
 };
