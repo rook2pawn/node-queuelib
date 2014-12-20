@@ -20,6 +20,7 @@ q.forEach(list,iterator,alldone)
 
     q.forEach(['c','a','t'],function(val,idx,lib) {
         console.log(val, idx);
+        lib.done() // signal next
     }, function() {
         console.log("all done");
     });
