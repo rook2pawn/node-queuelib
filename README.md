@@ -115,16 +115,34 @@ Methods
 .series ([fn1,fn2,..])
 ======================
 
-queue.series([
-    function(lib) {
-        // do something asynchronously
-        lib.done();
-    },
-    function(lib) {
-        // do something else asynchronously
-        lib.done();
-    }
-]);
+    queue.series([
+        function(lib) {
+            // do something asynchronously
+            lib.done();
+        },
+        function(lib) {
+            // do something else asynchronously
+            lib.done();
+        }
+    ]);
+
+You can also bind a context for any function in the series by declaring an object with a "fn" parameter and a "context" parameter like so: 
+
+
+    queue.series([
+        {
+            fn:function(lib) {
+                // do something asynchronously
+                var x = this.a + this.b; // 42
+                lib.done();
+            },
+            context: {a:30, b:12}
+        }
+        function(lib) {
+            // do something else asynchronously
+            lib.done();
+        }
+    ]);
 
 
 Example 1

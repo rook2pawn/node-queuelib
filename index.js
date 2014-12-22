@@ -112,7 +112,10 @@ function qlib() {
             padding = 0
         var id = gen_id()
         list.forEach(function(fn) {
-            this.queue.push({fn:fn,type:'async',id:id});
+            if ((typeof fn === 'object') && (fn.fn) && (fn.context))
+                this.queue.push({fn:fn.fn.bind(fn.context),type:'async',id:id});
+            else 
+                this.queue.push({fn:fn,type:'async',id:id});
         },this);
         if ((this.queue.length > 0) && (this.working == false)) {
             this.workAsync();
