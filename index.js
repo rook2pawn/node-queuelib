@@ -32,7 +32,11 @@ function qlib() {
             this.queue.push({el:el,fn:fn,type:'async'});
         else if (arguments.length == 4)
             this.queue.push({el:el,fn:fn,idx:idx,id:id,type:'async'});
+        console.log("Push Async:", arguments);
+        console.log("this.queue.length:", this.queue.length)
+        console.log("this.working:", this.working)
 		if ((this.queue.length > 0) && (this.working == false)) {
+            console.log("WORKING ASYNC")
 			this.workAsync();
 		}
 		return this;
@@ -128,7 +132,7 @@ function qlib() {
             done = function() { console.log ("All done.") }
         if (padding === undefined) 
             padding = 0
-        if (list) 
+        if (list && list.length) 
             list.forEach(function(arg,idx) {
                 this.queue.push({fn:iterator,type:'async',idx:idx,id:id,arg:arg,padding:padding})
                 if (idx == list.length - 1)
