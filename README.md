@@ -1,5 +1,23 @@
 [![Build Status](https://travis-ci.org/rook2pawn/node-queuelib.svg?branch=master)](https://travis-ci.org/rook2pawn/node-queuelib)
 
+
+## Example 
+
+    var QL = require('queuelib');
+    var q = new QL;
+    var sum = 0;
+    q.forEach([3,5,7],function(val,idx,lib) {
+      sum += val;
+      if (idx != 1) {
+        lib.done();
+      } else {
+        lib.terminate();    
+      }
+    },function() {
+      console.log(sum); // 8
+    })
+
+
 # QueueLib - a smaller, focused async library 
 
 Focusing on flow control in .series and .forEach, queuelib also has rate limiting and early termination in .series and .forEach without the need to throw errors.
