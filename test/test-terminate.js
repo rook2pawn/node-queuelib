@@ -1,9 +1,27 @@
 var Q = require('../');
-var queue = new Q;
-var list = [];
 var test = require('tape');
 
-test('terminate test', function (t) {
+test('terminate test while in forEach', function(t) {
+  t.plan(1);  
+  var queue = new Q;
+  var list = [];
+  queue.forEach(['a','b','c','d'],function(val,idx,lib) {
+    list.push(val);
+    if (idx == 2) {
+      lib.terminate();
+      return
+    } else 
+      lib.done();    
+  }, function() {
+    console.log("ALL DONE");
+    t.deepEqual(list,['a','b','c'])
+  })
+})
+
+test.skip('terminate test while in series', function (t) {
+    var queue = new Q;
+    var list = [];
+
     t.plan(2);
     queue.series([
         function(lib) {

@@ -1,8 +1,8 @@
 var EventEmitter = require('events').EventEmitter;
 var Hash = require('hashish');
-exports = module.exports = qlib;
+exports = module.exports = QueueLib;
 
-function qlib() {
+function QueueLib () {
 	this.queue = [];
 	this.working = false;
   this.workAsync = function() {
@@ -32,11 +32,7 @@ function qlib() {
         this.queue.push({el:el,fn:fn,type:'async'});
     else if (arguments.length == 4)
         this.queue.push({el:el,fn:fn,idx:idx,id:id,type:'async'});
-    //console.log("Push Async:", arguments);
-    //console.log("this.queue.length:", this.queue.length)
-    //console.log("this.working:", this.working)
 		if ((this.queue.length > 0) && (this.working == false)) {
-      //console.log("WORKING ASYNC")
 			this.workAsync();
 		}
 		return this;
@@ -97,10 +93,13 @@ function qlib() {
   this.terminate = function() {
     var id = this._id
     var tmp = [];
+    console.log("TERMINATE!",this.queue);
     for (var i = 0; i < this.queue.length; i++) {
+
       var item = this.queue[i];
       if ((item.id !== undefined) && (item.id == id)) {
         // unsaved
+        console.log("Not saving", item)
       } else {
         tmp.push(item);
       }
@@ -108,9 +107,6 @@ function qlib() {
     this.queue = tmp;
     this.done();
   };
-  var gen_id = function() {
-    return String.fromCharCode(~~(Math.random() * 26) + 97).concat((Math.random()+1).toString(36).substr(2,5))
-  }
   this.series = function(list,padding) {
     if (padding === undefined) 
         padding = 0
@@ -126,20 +122,26 @@ function qlib() {
     }
     return id
   }
-  this.forEach = function(list, iterator, done, padding) {
-    var id = gen_id()
-    if (done === undefined)
-        done = function() { }
-    if (padding === undefined) 
-        padding = 0
-    if (list && list.length) 
-      list.forEach(function(arg,idx) {
-          this.queue.push({fn:iterator,type:'async',idx:idx,id:id,arg:arg,padding:padding})
-          if (idx == list.length - 1)
-              this.queue.push({fn:done, idx:idx,id:id,type:'sync'})
-          if ((this.queue.length > 0) && (this.working == false))
-              this.workAsync();
-      },this)
-    else done()
-  }
 };
+
+QueueLib.prototype.forEach = function(list, iterator, done, padding) {
+  var id = gen_id()
+  if (padding === undefined) 
+    padding = 0
+  if (list && list.length) {
+    list.forEach(function(arg,idx) {
+      console.log("Pushing ", arg, idx);
+      this.queue.push({fn:iterator,type:'async',idx:idx,id:id,arg:arg,padding:padding})
+      if ((idx == list.length - 1) && (done !== undefined)) 
+        this.queue.push({fn:done, idx:idx,id:id,type:'sync',meta:'done'})
+    },this);
+    if ((this.queue.length > 0) && (this.working == false))
+      this.workAsync();
+  } else {
+    done();
+  }
+}
+
+var gen_id = function() {
+  return String.fromCharCode(~~(Math.random() * 26) + 97).concat((Math.random()+1).toString(36).substr(2,5))
+}

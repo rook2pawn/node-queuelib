@@ -1,53 +1,99 @@
 [![Build Status](https://travis-ci.org/rook2pawn/node-queuelib.svg?branch=master)](https://travis-ci.org/rook2pawn/node-queuelib)
 
-Example
-=======
+# QueueLib - a smaller, focused async library 
 
-    var ql = require('queuelib');
-    var q = new ql;
-
-    var iterator = function(num, idx, lib) {
-      console.log(num*2);
-      lib.done();
-    };
-    var alldone = function(err) {
-      // all done
-      if (err)
-        throw err
-      console.log("All done!")
-    };
-
-    q.forEach([1,2,3], iterator, alldone)
-
-    // 2
-    // 4
-    // 6 
-    // All done!
+Focusing on flow control in .series and .forEach, queuelib also has rate limiting and early termination in .series and .forEach without the need to throw errors.
 
 
+### Main Methods
 
-.forEach(list,iterator,alldone,ratelimit)
------------------------------------------
+#### .forEach (list,iterator,alldone,ratelimit)
 
 Optional alldone function to be executed after entire list is processed.
 Optional ratelimit takes a positive integer that specifies the number of
-milliseconds between iterations.
+milliseconds between iterations. 
+
+*Iterator* signature is called as follows: 
+
+    function (value, idx, lib) {
+      lib.done(); // to signal next
+    }
+
+    // OR 
+
+    function (value, idx, lib) {
+      lib.terminate(); // to stop the forEach.
+    }
 
 
-Rate Limiting
--------------
+#### .series([fn1, fn2, ... ], ratelimit)
 
-Rate Limiting. Just supply the millisecond after .forEach or .series
+Optional ratelimit takes a positive integer that specifies the number of
+milliseconds between iterations. 
 
-    q.series(<list>,<padding>);
+Example:
 
-    // or
+    q.series([
+      function(value,lib) {
+        lib.done();
+      },
+      function(value,lib) {
+        lib.done();
+      }, 
+      ...
+      function(value,lib) {
+        lib.done();
+      }
+    ])
 
-    q.forEach(<list>,<iterator>,<all done>, <padding>)
+
+You can also bind a context for any function in the series by declaring an object with a "fn" parameter and a "context" parameter like so: 
+
+    q.series([
+      { fn : function(lib) {
+          var x = this.a + this.b; // 42
+          lib.done();
+        },
+        context: {a:30, b:12}
+      },
+      function(lib) {
+        lib.done();
+      }
+    ]);
 
 
-memory key-value store across series or forEach
------------------------------------------------
+### Flow control
+
+#### .done()
+
+    queue.series([
+      function(lib) {
+        lib.done();
+      },
+      function(lib) {
+        lib.done();
+      }
+    ]);
+
+
+#### .terminate()
+
+    queue.series([
+      function(lib) {
+        lib.terminate();
+      },
+      function(lib) {
+          // this function will be removed from the queue after the call to terminate
+      },
+      function(lib) {
+          // so will this one  , etc
+      }
+    ]);
+
+
+### Other features
+
+#### memory key-value store across series or forEach
 
 Just call .done(hash) to store the keys/values of the hash
 
@@ -83,37 +129,8 @@ You can also use .set(hash)
     ]);
 
 
-Early termination flow control
--------------------------------
-        
-    queue.series([
-    function(lib) {
-        // stuff
-        lib.terminate();
-    },
-    function(lib) {
-        // this function will be removed from the queue after the call to terminate
-    },
-    function(lib) {
-        // so will this one  , etc
-    }
-    ]);
 
-
-QueueLib
-========
-
-Asynchronous queue processor
-
-    - lightweight, simple
-    - flow control in series
-
-
-Methods
-=======
-
-.pushAsync(fn)
-==============
+#### .pushAsync(fn)
 
     var Q = require('queuelib');
     var queue = new Q;
@@ -128,58 +145,12 @@ Methods
       lib.done();
     });
 
-.series ([fn1,fn2,..])
-======================
 
-    queue.series([
-      function(lib) {
-          // do something asynchronously
-          lib.done();
-      },
-      function(lib) {
-          // do something else asynchronously
-          lib.done();
-      }
-    ]);
+### License
 
-You can also bind a context for any function in the series by declaring an object with a "fn" parameter and a "context" parameter like so: 
+MIT 
+Copyright 2011-2017 David Wee
 
-    queue.series([
-      {
-        fn:function(lib) {
-            // do something asynchronously
-            var x = this.a + this.b; // 42
-            lib.done();
-        },
-        context: {a:30, b:12}
-      }
-      function(lib) {
-        // do something else asynchronously
-        lib.done();
-      }
-    ]);
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-
-Example 1
----------
-
-    var Q = require('queuelib');
-    var request = require('request');
-    var queue = new Q;
-    
-    queue.pushAsync(function(lib) {
-      // do something asynchronously
-      request('http://google.com',function(err,response,body) {
-        console.log(body);
-        lib.done();
-      });
-    });
-    
-    queue.pushAsync(function(lib) {
-      // do something else asynchronously
-      request('http://reddit.com',function(err,response,body) {
-          console.log(body);
-          lib.done();
-      });
-      lib.done();
-    });
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
