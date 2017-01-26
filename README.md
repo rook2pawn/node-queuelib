@@ -4,14 +4,19 @@
 
 Focusing on flow control in .series and .forEach, queuelib also has rate limiting and early termination in .series and .forEach without the need to throw errors.
 
+## Breaking changes 1/26/2017
+
+Type signatures forEach and series have changed
 
 ### Main Methods
 
-#### .forEach (list,iterator,alldone,ratelimit)
+#### .forEach (list,iterator,ratelimit,alldone)
 
-Optional alldone function to be executed after entire list is processed.
 Optional ratelimit takes a positive integer that specifies the number of
 milliseconds between iterations. 
+
+Optional alldone function to be executed after entire list is processed.
+
 
 *Iterator* signature is called as follows: 
 
@@ -26,10 +31,9 @@ milliseconds between iterations.
     }
 
 
-#### .series([fn1, fn2, ... ], ratelimit)
+#### .series([fn1, fn2, ... ], alldone)
 
-Optional ratelimit takes a positive integer that specifies the number of
-milliseconds between iterations. 
+Optional alldone function to be executed after entire list is processed.
 
 Example:
 

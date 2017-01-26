@@ -1,12 +1,12 @@
 var Q = require('../');
 var tape = require('tape')
-var queue = new Q;
-var list = ['a','b','c','d','e']
-var list2 = [1,2,3,4,5]
-
-var output = [];
 
 tape('test forEach',function(t) {
+  var queue = new Q;
+  var list = ['a','b','c','d','e']
+  var list2 = [1,2,3,4,5];
+  var output = [];
+
   t.plan(3)
   var start_time = new Date().getTime()
   queue.forEach(list,function(item,idx,lib) {
@@ -18,7 +18,7 @@ tape('test forEach',function(t) {
     queue.forEach(list2,function(item,idx,lib) {
       output.push({item:item,idx:idx})
       lib.done()
-    },function() {
+    },100, function() {
       var curr_time = new Date().getTime()
       t.deepEqual([
         {item:'a',idx:0},
@@ -33,14 +33,19 @@ tape('test forEach',function(t) {
         {item:5,idx:4}],output)
       t.ok((curr_time - start_time) > 1000)
       t.ok((curr_time - start_time) < 1100)
-    },100)
+    })
   })
 })
 
-tape.skip('test foreach miscellaneous',function(t) {
-    t.plan(1)
-    var q = new Q;
-    var x;
-    q.forEach(x)
-    t.ok(true)
+
+
+tape('test forEach empty',function(t) {
+  var queue = new Q;
+  t.plan(1);
+  queue.forEach([],function(item,idx,lib) {
+      t.fail('iterator should not occur')
+      lib.done()
+  },function() {
+    t.ok("Finished")
+  })
 })
