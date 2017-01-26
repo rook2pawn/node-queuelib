@@ -2,13 +2,20 @@
   "author": "David Wee <rook2pawn@gmail.com> (http://rook2pawn.com)",
   "name": "queuelib",
   "description": "Straightforward asynchronous queue processor",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "homepage": "https://github.com/rook2pawn/node-queuelib",
   "license" : "MIT",
   "repository": {
     "type": "git",
     "url": "git://github.com/rook2pawn/node-queuelib.git"
   },
+  "keywords" : [
+    "async",
+    "queue",
+    "flow control",
+    "early termination",
+    "termination"
+  ],
   "main": "index.js",
   "scripts": {
     "test": "tape test/test*.js"
