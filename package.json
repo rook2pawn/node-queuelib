@@ -16,7 +16,8 @@
     "early termination",
     "termination"
   ],
-  "main": "index.js",
+  "main": "index",
+  "types": "index",
   "scripts": {
     "test": "tape test/test*.js"
   },
