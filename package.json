@@ -4,17 +4,16 @@
   "description": "Straightforward asynchronous queue processor",
   "version": "2.0.1",
   "homepage": "https://github.com/rook2pawn/node-queuelib",
-  "license" : "MIT",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git://github.com/rook2pawn/node-queuelib.git"
   },
-  "keywords" : [
+  "keywords": [
     "async",
-    "queue",
-    "flow control",
-    "early termination",
-    "termination"
+    "job queue",
+    "promise",
+    "flow control"
   ],
   "main": "index.js",
   "scripts": {
@@ -22,8 +21,5 @@
   },
   "devDependencies": {
     "tape": ""
-  },
-  "dependencies": {
-    "hashish": ""
   }
 }
