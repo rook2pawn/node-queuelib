@@ -5,7 +5,7 @@ jq.enqueue((done) => {
   console.log("Hi! A");
   setTimeout(done, 2000);
 });
-jq.enqueue((done) => {
+jq.enqueue(() => {
   return new Promise((resolve, reject) => {
     console.log("Promise B!");
     resolve();

@@ -20,11 +20,11 @@ test("ordering test", function (t) {
   });
 });
 
-test("ordering test B", function (t) {
-  t.plan(1);
+test("test that empty event fires", function (t) {
+  t.plan(3);
   let number = 1;
   const jq = new JobQueue({ MAX_ACTIVE: 2 });
-  jq.enqueue((done) => {
+  jq.enqueue(() => {
     return new Promise((resolve, reject) => {
       number *= 2;
       resolve();
@@ -34,7 +34,9 @@ test("ordering test B", function (t) {
     number++;
     done();
   });
-  jq.on("empty", () => {
+  jq.on("empty", ({ success, failure }) => {
+    t.equal(success, 2);
+    t.equal(failure, 0);
     t.equal(number, 3); // 1 => 2 => 3
   });
 });
