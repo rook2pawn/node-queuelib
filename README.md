@@ -50,6 +50,12 @@ jq.enqueue(() => {
 });
 ```
 
+```js
+jq.enqueue((done) => {
+  return done("Uh oh");
+});
+```
+
 ### License
 
 MIT
