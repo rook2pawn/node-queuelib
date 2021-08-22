@@ -42,7 +42,7 @@ Configure the max active concurrent jobs. Defaults to 1.
 const jq = new JobQueue({ MAX_ACTIVE: 5 });
 ```
 
-## Error Handling
+## Error Handling - Signal errors
 
 ```js
 jq.enqueue(() => {
@@ -55,6 +55,18 @@ jq.enqueue((done) => {
   return done("Uh oh");
 });
 ```
+
+## Errror Handling - On failure
+
+```js
+jq.on("failure", ({ error }) => {
+  console.log(JSON.stringify({ e: error, message: "caught error" }));
+});
+```
+
+# Links
+
+- [Repo](https://github.com/rook2pawn/node-queuelib)
 
 ### License
 

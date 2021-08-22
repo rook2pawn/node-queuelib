@@ -28,3 +28,30 @@ test("error handling", function (t) {
     return done();
   });
 });
+
+test("error handling - failure event", function (t) {
+  t.plan(2);
+  const jq = new JobQueue();
+  let count = 0;
+  jq.on("failure", ({ error }) => {
+    if (count === 1) {
+      t.equal(error, "beep");
+    }
+    if (count === 2) {
+      t.equal(error, "boo");
+    }
+  });
+  jq.enqueue(() => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        count++;
+        return reject("beep");
+      }, 2000);
+    });
+  });
+  jq.enqueue((done) => {
+    // error
+    count++;
+    return done("boo");
+  });
+});

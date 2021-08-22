@@ -34,9 +34,12 @@ class JobQueue {
       }
     }
   }
-  finish({ isSuccess }) {
+  finish({ isSuccess, error }) {
     this.num_active--;
     isSuccess ? this.success++ : this.failure++;
+    if (!isSuccess && this.eventHash["failure"] !== undefined) {
+      this.eventHash["failure"]({ error });
+    }
     this.next();
   }
   execute(fn) {
@@ -52,14 +55,14 @@ class JobQueue {
             this.finish({ isSuccess: true });
           })
           .catch((e) => {
-            this.finish({ isSuccess: false });
+            this.finish({ isSuccess: false, error: e });
           });
       } else {
         return obj;
       }
     }).then((e) => {
       if (e !== undefined) {
-        this.finish({ isSuccess: false });
+        this.finish({ isSuccess: false, error: e });
       } else {
         this.finish({ isSuccess: true });
       }
